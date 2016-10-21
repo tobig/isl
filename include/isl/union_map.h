@@ -24,11 +24,13 @@ __isl_give isl_union_map *isl_union_map_from_basic_map(
 	__isl_take isl_basic_map *bmap);
 __isl_constructor
 __isl_give isl_union_map *isl_union_map_from_map(__isl_take isl_map *map);
+__isl_polly_export
 __isl_give isl_union_map *isl_union_map_empty(__isl_take isl_space *dim);
 __isl_give isl_union_map *isl_union_map_copy(__isl_keep isl_union_map *umap);
 __isl_null isl_union_map *isl_union_map_free(__isl_take isl_union_map *umap);
 
 isl_ctx *isl_union_map_get_ctx(__isl_keep isl_union_map *umap);
+__isl_polly_export
 __isl_give isl_space *isl_union_map_get_space(__isl_keep isl_union_map *umap);
 
 __isl_give isl_union_map *isl_union_map_reset_user(
@@ -81,6 +83,7 @@ __isl_give isl_union_map *isl_union_map_lexmin(__isl_take isl_union_map *umap);
 __isl_export
 __isl_give isl_union_map *isl_union_map_lexmax(__isl_take isl_union_map *umap);
 
+__isl_polly
 __isl_give isl_union_map *isl_union_map_add_map(__isl_take isl_union_map *umap,
 	__isl_take isl_map *map);
 __isl_export
@@ -106,6 +109,7 @@ __isl_give isl_union_map *isl_union_map_flat_domain_product(
 __isl_export
 __isl_give isl_union_map *isl_union_map_range_product(
 	__isl_take isl_union_map *umap1, __isl_take isl_union_map *umap2);
+__isl_polly
 __isl_give isl_union_map *isl_union_map_flat_range_product(
 	__isl_take isl_union_map *umap1, __isl_take isl_union_map *umap2);
 __isl_export

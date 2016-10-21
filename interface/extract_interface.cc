@@ -121,10 +121,20 @@ bool has_annotation(Decl *decl, const char *name)
 	return false;
 }
 
+/* Is decl marked as exported for Polly?
+ */
+static bool is_polly(Decl *decl)
+{
+	return has_annotation(decl, "isl_polly");
+}
+
 /* Is decl marked as exported?
  */
 static bool is_exported(Decl *decl)
 {
+	if (is_polly(decl) && !PollyExtensions)
+		return false;
+
 	return has_annotation(decl, "isl_export");
 }
 
@@ -422,11 +432,14 @@ int main(int argc, char *argv[])
 	PO.addMacroDef("__isl_give=__attribute__((annotate(\"isl_give\")))");
 	PO.addMacroDef("__isl_keep=__attribute__((annotate(\"isl_keep\")))");
 	PO.addMacroDef("__isl_take=__attribute__((annotate(\"isl_take\")))");
-	PO.addMacroDef("__isl_export=__attribute__((annotate(\"isl_export\")))");
+	PO.addMacroDef("__isl_export=__attribute__((annotate(\"isl_export\")))");;
+	PO.addMacroDef("__isl_polly_export=__attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
+	PO.addMacroDef("__isl_polly=__attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
 	PO.addMacroDef("__isl_overload="
 	    "__attribute__((annotate(\"isl_overload\"))) "
 	    "__attribute__((annotate(\"isl_export\")))");
 	PO.addMacroDef("__isl_constructor=__attribute__((annotate(\"isl_constructor\"))) __attribute__((annotate(\"isl_export\")))");
+	PO.addMacroDef("__isl_polly_constructor=__attribute__((annotate(\"isl_constructor\"))) __attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
 	PO.addMacroDef("__isl_subclass(super)=__attribute__((annotate(\"isl_subclass(\" #super \")\"))) __attribute__((annotate(\"isl_export\")))");
 
 	create_preprocessor(Clang);

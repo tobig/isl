@@ -30,11 +30,23 @@
 #ifndef __isl_export
 #define __isl_export
 #endif
+#ifndef __isl_polly
+#define __isl_polly
+#endif
+#ifndef __isl_polly_export
+#define __isl_polly_export
+#endif
 #ifndef __isl_overload
 #define __isl_overload
 #endif
 #ifndef __isl_constructor
 #define __isl_constructor
+#endif
+#ifndef __isl_polly_constructor
+#define __isl_polly_constructor
+#endif
+#ifndef __isl_polly_constructor
+#define __isl_polly_constructor
 #endif
 #ifndef __isl_subclass
 #define __isl_subclass(super)

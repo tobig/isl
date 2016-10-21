@@ -10,11 +10,12 @@
 extern "C" {
 #endif
 
-struct isl_local_space;
+struct __isl_polly_export isl_local_space;
 typedef struct isl_local_space isl_local_space;
 
 isl_ctx *isl_local_space_get_ctx(__isl_keep isl_local_space *ls);
 
+__isl_polly_constructor
 __isl_give isl_local_space *isl_local_space_from_space(__isl_take isl_space *dim);
 
 __isl_give isl_local_space *isl_local_space_copy(
