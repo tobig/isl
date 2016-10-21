@@ -33,6 +33,7 @@ unsigned isl_basic_set_dim(__isl_keep isl_basic_set *bset,
 
 unsigned isl_set_n_dim(__isl_keep isl_set *set);
 unsigned isl_set_n_param(__isl_keep isl_set *set);
+__isl_polly
 unsigned isl_set_dim(__isl_keep isl_set *set, enum isl_dim_type type);
 
 isl_ctx *isl_basic_set_get_ctx(__isl_keep isl_basic_set *bset);
@@ -231,6 +232,7 @@ isl_bool isl_basic_set_is_universe(__isl_keep isl_basic_set *bset);
 isl_bool isl_basic_set_plain_is_empty(__isl_keep isl_basic_set *bset);
 __isl_export
 isl_bool isl_basic_set_is_empty(__isl_keep isl_basic_set *bset);
+__isl_polly
 isl_bool isl_basic_set_is_bounded(__isl_keep isl_basic_set *bset);
 __isl_export
 isl_bool isl_basic_set_is_subset(__isl_keep isl_basic_set *bset1,
@@ -239,6 +241,7 @@ isl_bool isl_basic_set_plain_is_equal(__isl_keep isl_basic_set *bset1,
 	__isl_keep isl_basic_set *bset2);
 
 __isl_give isl_set *isl_set_empty(__isl_take isl_space *space);
+__isl_polly_export
 __isl_give isl_set *isl_set_universe(__isl_take isl_space *space);
 __isl_give isl_set *isl_set_nat_universe(__isl_take isl_space *dim);
 __isl_give isl_set *isl_set_copy(__isl_keep isl_set *set);
@@ -314,6 +317,7 @@ __isl_give isl_set *isl_set_insert_dims(__isl_take isl_set *set,
 		enum isl_dim_type type, unsigned pos, unsigned n);
 __isl_give isl_basic_set *isl_basic_set_add_dims(__isl_take isl_basic_set *bset,
 		enum isl_dim_type type, unsigned n);
+__isl_polly
 __isl_give isl_set *isl_set_add_dims(__isl_take isl_set *set,
 		enum isl_dim_type type, unsigned n);
 __isl_give isl_basic_set *isl_basic_set_move_dims(__isl_take isl_basic_set *bset,
@@ -322,9 +326,11 @@ __isl_give isl_basic_set *isl_basic_set_move_dims(__isl_take isl_basic_set *bset
 __isl_give isl_set *isl_set_move_dims(__isl_take isl_set *set,
 	enum isl_dim_type dst_type, unsigned dst_pos,
 	enum isl_dim_type src_type, unsigned src_pos, unsigned n);
+__isl_polly
 __isl_give isl_basic_set *isl_basic_set_project_out(
 		__isl_take isl_basic_set *bset,
 		enum isl_dim_type type, unsigned first, unsigned n);
+__isl_polly
 __isl_give isl_set *isl_set_project_out(__isl_take isl_set *set,
 		enum isl_dim_type type, unsigned first, unsigned n);
 __isl_give isl_map *isl_set_project_onto_map(__isl_take isl_set *set,
@@ -376,6 +382,7 @@ isl_bool isl_set_plain_is_universe(__isl_keep isl_set *set);
 isl_bool isl_set_is_params(__isl_keep isl_set *set);
 __isl_export
 isl_bool isl_set_is_empty(__isl_keep isl_set *set);
+__isl_polly
 isl_bool isl_set_is_bounded(__isl_keep isl_set *set);
 __isl_export
 isl_bool isl_set_is_subset(__isl_keep isl_set *set1, __isl_keep isl_set *set2);
@@ -509,7 +516,9 @@ __isl_give isl_basic_set *isl_basic_set_solutions(
 	__isl_take isl_basic_set *bset);
 __isl_give isl_basic_set *isl_set_solutions(__isl_take isl_set *set);
 
+__isl_polly
 __isl_give isl_pw_aff *isl_set_dim_max(__isl_take isl_set *set, int pos);
+__isl_polly
 __isl_give isl_pw_aff *isl_set_dim_min(__isl_take isl_set *set, int pos);
 
 __isl_give char *isl_basic_set_to_str(__isl_keep isl_basic_set *bset);
