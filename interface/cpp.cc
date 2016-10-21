@@ -603,6 +603,12 @@ void cpp_generator::print_method_param_use(ostream &os, ParmVarDecl *param,
 	const char *name_str = name.c_str();
 	QualType type = param->getOriginalType();
 
+	if (type->isEnumeralType()) {
+		string typestr = type.getAsString();
+		osprintf(os, "static_cast<%s>(%s)", typestr.c_str(), name_str);
+		return;
+	}
+
 	if (type->isIntegerType()) {
 		osprintf(os, "%s", name_str);
 		return;
@@ -1013,6 +1019,9 @@ string cpp_generator::type2cpp(QualType type)
 
 	if (is_isl_stat(type))
 		return "isl::stat";
+
+	if (type->isEnumeralType())
+		return "isl::dim";
 
 	if (type->isIntegerType())
 		return type.getAsString();
