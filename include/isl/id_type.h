@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-struct __polly_export isl_id;
+struct isl_id;
 typedef struct isl_id isl_id;
 
 ISL_DECLARE_LIST_TYPE(id)
