@@ -1,4 +1,3 @@
-
 #include <functional>
 #include <string>
 
@@ -68,16 +67,6 @@ public:
 enum class stat {
   ok = isl_stat_ok,
   error = isl_stat_error
-};
-
-enum class dim {
-  cst = isl_dim_cst,
-  param = isl_dim_param,
-  in = isl_dim_in,
-  out = isl_dim_out,
-  set = isl_dim_set,
-  div = isl_dim_div,
-  all = isl_dim_all
 };
 
 }
