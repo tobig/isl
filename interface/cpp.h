@@ -17,7 +17,9 @@ public:
 		set<FunctionDecl *> functions,
 		bool noexceptions = false) :
 		generator(exported_types, exported_functions, functions),
-		noexceptions(noexceptions) {}
+		noexceptions(noexceptions) {
+		polly_extensions = true;
+	}
 
 	enum function_kind {
 		function_kind_static_method,
@@ -27,6 +29,7 @@ public:
 
 	virtual void generate();
 private:
+	bool polly_extensions;
 	void print_file(ostream &os, std::string filename);
 	void print_forward_declarations(ostream &os);
 	void print_declarations(ostream &os);
