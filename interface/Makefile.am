@@ -54,5 +54,11 @@ isl-noexceptions.h: extract_interface libdep.a isl.h.top
 			$(srcdir)/all.h) \
 			> isl-noexceptions.h
 
+isl-polly.h: extract_interface all.h isl.h.top
+	(cat $(srcdir)/isl.h.top; \
+		./extract_interface$(EXEEXT) --language=cpp --polly $(includes) \
+			$(srcdir)/all.h) \
+			> isl-polly.h
+
 dist-hook: isl.py isl-noexceptions.h
 	cp isl.py isl-noexceptions.h $(distdir)/
