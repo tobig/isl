@@ -269,6 +269,10 @@ void cpp_generator::print_public_constructors_decl(ostream &os,
 
 	osprintf(os, "  inline /* implicit */ %s(const isl::%s &obj);\n",
 		 cppname, cppname);
+	if (polly_extensions) {
+		osprintf(os, "  inline /* implicit */ %s(std::nullptr_t);\n",
+			cppname);
+	}
 }
 
 /* Print declarations for constructors for class "class" to "os".
@@ -486,6 +490,10 @@ void cpp_generator::print_public_constructors_impl(ostream &os,
 	osprintf(os, "%s::%s()\n    : ptr(nullptr) {}\n\n", cppname, cppname);
 	osprintf(os, "%s::%s(const isl::%s &obj)\n    : ptr(obj.copy()) {}\n",
 		 cppname, cppname, cppname, name);
+	if (polly_extensions) {
+		osprintf(os, "%s::%s(std::nullptr_t)\n    : ptr(nullptr) {}\n\n",
+			cppname, cppname);
+	}
 }
 
 /* Print implementations of constructors for class "clazz" to "os".
