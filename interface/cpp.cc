@@ -155,6 +155,7 @@ void cpp_generator::print_class(ostream &os, const isl_class &clazz)
 	osprintf(os, "// declarations for isl::%s\n", cppname);
 
 	print_class_factory_decl(os, clazz);
+	print_class_global_constructor_proxy(os, clazz);
 	osprintf(os, "\n");
 	osprintf(os, "class %s {\n", cppname);
 	osprintf(os, "  friend ");
@@ -209,6 +210,18 @@ void cpp_generator::print_class_factory_decl(ostream &os,
 
 	osprintf(os, "inline isl::%s manage(__isl_take %s *ptr);\n", cppname,
 		 name);
+}
+
+void cpp_generator::print_class_global_constructor_proxy(ostream &os,
+	const isl_class &clazz)
+{
+	if (!polly_extensions)
+		return;
+
+	const char *name = clazz.name.c_str();
+	std::string cppstring = type2cpp(clazz);
+	const char *cppname = cppstring.c_str();
+	osprintf(os, "inline isl::%s give(__isl_take %s *ptr);\n\n", cppname, name);
 }
 
 /* Print declarations of private constructors for class "clazz" to "os".
@@ -440,6 +453,12 @@ void cpp_generator::print_class_factory_impl(ostream &os,
 	osprintf(os, "isl::%s manage(__isl_take %s *ptr) {\n", cppname, name);
 	osprintf(os, "  return %s(ptr);\n", cppname);
 	osprintf(os, "}\n");
+	if (polly_extensions) {
+		osprintf(os, "isl::%s give(__isl_take %s *ptr) {\n", cppname,
+			name);
+		osprintf(os, "  return manage(ptr);\n", cppname);
+		osprintf(os, "}\n\n");
+	}
 }
 
 /* Print implementations of private constructors for class "clazz" to "os".
