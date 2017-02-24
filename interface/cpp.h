@@ -49,6 +49,8 @@ private:
 	void print_methods_decl(ostream &os, const isl_class &clazz);
 	void print_method_group_decl(ostream &os, const isl_class &clazz,
 		const string &fullname, const set<FunctionDecl *> &methods);
+	void print_class_global_constructor_proxy(ostream &os,
+		const isl_class &clazz);
 	void print_method_decl(ostream &os, const isl_class &clazz,
 		const string &fullname, FunctionDecl *method,
 		function_kind kind);
