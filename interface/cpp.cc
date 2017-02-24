@@ -354,6 +354,10 @@ void cpp_generator::print_ptr_decl(ostream &os, const isl_class &clazz)
 	osprintf(os, "  inline __isl_keep %s *get() const;\n", name);
 	osprintf(os, "  inline __isl_give %s *release();\n", name);
 	osprintf(os, "  inline bool is_null() const;\n");
+	if (polly_extensions) {
+		osprintf(os, "  inline __isl_keep %s *keep() const;\n", name);
+		osprintf(os, "  inline __isl_give %s *take();\n", name);
+	}
 }
 
 /* Print declarations for methods in class "clazz" to "os".
@@ -535,6 +539,14 @@ void cpp_generator::print_ptr_impl(ostream &os, const isl_class &clazz)
 	osprintf(os, "bool %s::is_null() const {\n", cppname);
 	osprintf(os, "  return ptr == nullptr;\n");
 	osprintf(os, "}\n");
+	if (polly_extensions) {
+		osprintf(os, "__isl_keep %s *%s::keep() const {\n", name, cppname);
+		osprintf(os, "  return get();\n");
+		osprintf(os, "}\n\n");
+		osprintf(os, "__isl_give %s *%s::take() {\n", name, cppname);
+		osprintf(os, "  return release();\n");
+		osprintf(os, "}\n\n");
+	}
 }
 
 /* Print definitions for methods of class "clazz" to "os".
