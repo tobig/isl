@@ -176,6 +176,8 @@ void cpp_generator::print_class(ostream &os, const isl_class &clazz)
 	print_destructor_decl(os, clazz);
 	print_ptr_decl(os, clazz);
 	print_get_ctx_decl(os);
+	print_str_decl(os, clazz);
+	print_dump_decl(os, clazz);
 	osprintf(os, "\n");
 	print_methods_decl(os, clazz);
 
@@ -396,6 +398,21 @@ void cpp_generator::print_get_ctx_decl(ostream &os)
 {
 	osprintf(os, "  inline isl::ctx get_ctx() const;\n");
 }
+void cpp_generator::print_str_decl(ostream &os, const isl_class &clazz)
+{
+	if (!clazz.fn_to_str)
+		return;
+
+	osprintf(os, "  inline std::string to_str() const;\n");
+}
+
+void cpp_generator::print_dump_decl(ostream &os, const isl_class &clazz)
+{
+	if (!clazz.fn_dump)
+		return;
+
+	osprintf(os, "  inline void dump() const;\n");
+}
 
 /* Print declarations for methods in class "clazz" to "os".
  */
@@ -463,6 +480,9 @@ void cpp_generator::print_class_impl(ostream &os, const isl_class &clazz)
 	print_ptr_impl(os, clazz);
 	osprintf(os, "\n");
 	print_get_ctx_impl(os, clazz);
+	print_str_impl(os, clazz);
+	osprintf(os, "\n");
+	print_dump_impl(os, clazz);
 	osprintf(os, "\n");
 	print_methods_impl(os, clazz);
 }
@@ -668,6 +688,37 @@ void cpp_generator::print_get_ctx_impl(ostream &os, const isl_class &clazz)
 	osprintf(os, "isl::ctx %s::get_ctx() const {\n", cppname);
 	osprintf(os, "  return isl::ctx(%s_get_ctx(ptr));\n", name);
 	osprintf(os, "}\n");
+}
+
+void cpp_generator::print_dump_impl(ostream &os, const isl_class &clazz)
+{
+	if (!clazz.fn_dump)
+		return;
+
+	const char *name = clazz.name.c_str();
+	std::string cppstring = type2cpp(clazz);
+	const char *cppname = cppstring.c_str();
+	osprintf(os, "void %s::dump() const {\n", cppname);
+	osprintf(os, "  %s_dump(get());\n", name, name);
+	osprintf(os, "}\n\n");
+}
+
+void cpp_generator::print_str_impl(ostream &os, const isl_class &clazz)
+{
+	if (!clazz.fn_to_str)
+		return;
+
+	const char *name = clazz.name.c_str();
+	std::string cppstring = type2cpp(clazz);
+	const char *cppname = cppstring.c_str();
+	osprintf(os, "std::string %s::to_str() const {\n", cppname);
+	osprintf(os, "  char *Tmp = %s_to_str(get());\n", name, name);
+	osprintf(os, "  if (!Tmp)\n");
+	osprintf(os, "    return \"\";\n");
+	osprintf(os, "  std::string S(Tmp);\n");
+	osprintf(os, "  free(Tmp);\n");
+	osprintf(os, "  return S;\n");
+	osprintf(os, "}\n\n");
 }
 
 /* Print definitions for methods of class "clazz" to "os".
