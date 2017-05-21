@@ -129,6 +129,7 @@ bool has_annotation(Decl *decl, const char *name)
  */
 static bool is_polly(Decl *decl)
 {
+	return true;
 	return has_annotation(decl, "isl_polly");
 }
 
@@ -138,6 +139,68 @@ static bool is_exported(Decl *decl)
 {
 	if (is_polly(decl) && !PollyExtensions)
 		return false;
+
+	if (PollyExtensions && isa<FunctionDecl>(decl)) {
+		FunctionDecl *FDecl = cast<FunctionDecl>(decl);
+		std::string N = FDecl->getName();
+		return (N.find("dump") == std::string::npos &&
+			N.find("get_ctx") == std::string::npos &&
+			N.find("isl_ast_expr_or") == std::string::npos &&
+			N.find("foreach_ast_op_type") == std::string::npos &&
+			N.find("foreach_descendant_top_down") == std::string::npos &&
+			N.find("foreach_schedule_node_top_down") == std::string::npos &&
+			N.find("foreach_descendant_top_down") == std::string::npos &&
+			N.find("set_dim_name") == std::string::npos &&
+			N.find("_list_") == std::string::npos &&
+			N.find("_n_") == std::string::npos &&
+			N.find("from_constraint_matrices") == std::string::npos &&
+			N.find("partial_") == std::string::npos &&
+			N.find("total_dim") == std::string::npos &&
+			N.find("compare_at") == std::string::npos &&
+			N.find("map_descendant_bottom_up") == std::string::npos &&
+			N.find("isl_space_drop_outputs") == std::string::npos &&
+			N.find("isl_space_extend") == std::string::npos &&
+			N.find("isl_space_match") == std::string::npos &&
+			N.find("isl_space_tuple_match") == std::string::npos &&
+			N.find("isl_union_map_compute_flow") == std::string::npos &&
+			N.find("isl_val_gcdext") == std::string::npos &&
+			N.find("get_d") == std::string::npos &&
+			N.find("compute_divs") == std::string::npos &&
+			N.find("dims_get_sign") == std::string::npos &&
+			N.find("basic_set_add") == std::string::npos &&
+			N.find("align_divs") == std::string::npos &&
+			N.find("fix_input_si") == std::string::npos &&
+			N.find("map_power") == std::string::npos &&
+			N.find("path_lengths") == std::string::npos &&
+			N.find("remove_inputs") == std::string::npos &&
+			N.find("read_from_file") == std::string::npos &&
+			N.find("transitive_closure") == std::string::npos &&
+			N.find("disjoint") == std::string::npos &&
+			N.find("lift") == std::string::npos &&
+			N.find("isl_val_get_abs_num_chunks") == std::string::npos &&
+			N.find("isl_val_int_from_chunks") == std::string::npos &&
+			N.find("isl_ast_build_set") == std::string::npos &&
+			N.find("copy") == std::string::npos &&
+			N.find("try_get") == std::string::npos &&
+			N.find("get_parent_type") == std::string::npos &&
+			N.find("isl_set_fix_dim_si") == std::string::npos &&
+			N.find("isl_set_eliminate_dims") == std::string::npos &&
+			N.find("isl_set_get_hash") == std::string::npos &&
+			N.find("isl_space_drop_inputs") == std::string::npos &&
+			N.find("dim_residue_class_val") == std::string::npos &&
+			N.find("map_schedule_node_bottom_up") == std::string::npos &&
+			N.find("void") == std::string::npos &&
+			N.find("to_str") == std::string::npos &&
+			N.find("foreach_scc") == std::string::npos &&
+			N.find("set_free_user") == std::string::npos &&
+			N.find("and") == std::string::npos &&
+			N.find("get_op_type") == std::string::npos &&
+			N.find("get_type") == std::string::npos &&
+			N.find("apply_multi_aff") == std::string::npos &&
+			N.find("free") == std::string::npos &&
+			N.find("delete") == std::string::npos &&
+			N.find("print") == std::string::npos);
+	}
 
 	return has_annotation(decl, "isl_export");
 }
