@@ -191,6 +191,7 @@ static bool is_exported(Decl *decl)
 			N.find("copy") == std::string::npos &&
 			N.find("try_get") == std::string::npos &&
 			N.find("get_parent_type") == std::string::npos &&
+			N.find("isl_basic_set_has_defining_inequalities") == std::string::npos &&
 			N.find("isl_set_fix_dim_si") == std::string::npos &&
 			N.find("isl_set_eliminate_dims") == std::string::npos &&
 			N.find("isl_set_get_hash") == std::string::npos &&
