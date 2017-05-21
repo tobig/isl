@@ -172,6 +172,10 @@ bool generator::is_overload(Decl *decl)
  */
 bool generator::is_constructor(Decl *decl)
 {
+	FunctionDecl *FDecl = cast<FunctionDecl>(decl);
+	std::string N = FDecl->getName();
+	if ((N.find("read_from_str") != std::string::npos))
+		return true;
 	return has_annotation(decl, "isl_constructor");
 }
 
