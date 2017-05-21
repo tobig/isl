@@ -144,6 +144,13 @@ static bool is_exported(Decl *decl)
 	if (PollyExtensions && isa<FunctionDecl>(decl)) {
 		FunctionDecl *FDecl = cast<FunctionDecl>(decl);
 		std::string N = FDecl->getName();
+		if (	N.find("is_disjoint") != std::string::npos ||
+			N.find("get_domain") != std::string::npos ||
+			N.find("band_member_set_coincident") != std::string::npos ||
+			N.find("band_member_get_coincident") != std::string::npos ||
+			N.find("from_domain_and_range") != std::string::npos)
+			return true;
+
 		return (N.find("dump") == std::string::npos &&
 			N.find("get_ctx") == std::string::npos &&
 			N.find("isl_ast_expr_or") == std::string::npos &&
