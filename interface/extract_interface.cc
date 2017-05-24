@@ -191,6 +191,12 @@ static bool is_exported(Decl *decl)
 			N.find("try_get") == std::string::npos &&
 			N.find("get_parent_type") == std::string::npos &&
 			N.find("isl_basic_set_has_defining_inequalities") == std::string::npos &&
+			N.find("isl_basic_map_has_defining_equality") == std::string::npos &&
+			N.find("isl_constraint_dim") == std::string::npos &&
+			N.find("isl_basic_set_has_defining_equality") == std::string::npos &&
+			N.find("isl_constraint_is_equal") == std::string::npos &&
+			N.find("isl_constraint_negate") == std::string::npos &&
+			N.find("isl_constraint_cow") == std::string::npos &&
 			N.find("isl_set_fix_dim_si") == std::string::npos &&
 			N.find("isl_set_eliminate_dims") == std::string::npos &&
 			N.find("isl_set_get_hash") == std::string::npos &&
