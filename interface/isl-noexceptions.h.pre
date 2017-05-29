@@ -33,7 +33,7 @@ public:
   bool is_false() const { return val == isl_bool_false; }
   bool is_true() const { return val == isl_bool_true; }
 
-  explicit operator bool() const {
+  operator bool() const {
     ISLPP_ASSERT(!is_error(), "IMPLEMENTATION ERROR: Unhandled error state");
     return is_true();
   }
