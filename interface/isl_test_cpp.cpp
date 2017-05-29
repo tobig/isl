@@ -188,6 +188,7 @@ void test_return_int(isl::ctx ctx)
  *    respectively
  *  - Explicit conversion to 'bool'
  *  - Implicit conversion to 'bool'
+ *  - Implicit conversion to 'long'
  *  - The complement operator
  *  - Explicit construction from 'true' and 'false'
  *  - Explicit construction form isl_bool
@@ -218,6 +219,22 @@ void test_return_bool(isl::ctx ctx)
 	assert(bool(b_false) == false);
 
 	assert(b_true);
+
+	bool use_in_bool_expr = b_true && true;
+	bool use_in_bool_expr_2 = true && b_true;
+
+	assert(use_in_bool_expr == use_in_bool_expr_2 &&
+	       use_in_bool_expr == true);
+
+	bool bool_true = b_true;
+	bool bool_false = b_false;
+
+	assert(bool_true && !bool_false);
+
+	long long_true = b_true;
+	long long_false = b_false;
+
+	assert(long_true && !long_false);
 
 	assert((!b_false).is_true());
 	assert((!b_true).is_false());
