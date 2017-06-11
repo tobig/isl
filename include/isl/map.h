@@ -15,7 +15,6 @@
 #include <isl/ctx.h>
 #include <isl/space_type.h>
 #include <isl/vec.h>
-#include <isl/mat.h>
 #include <isl/printer.h>
 #include <isl/local_space.h>
 #include <isl/aff_type.h>
@@ -654,20 +653,6 @@ __isl_give isl_map *isl_map_align_params(__isl_take isl_map *map,
 __isl_give isl_basic_map *isl_basic_map_drop_unused_params(
 	__isl_take isl_basic_map *bmap);
 __isl_give isl_map *isl_map_drop_unused_params(__isl_take isl_map *map);
-
-__isl_give isl_mat *isl_basic_map_equalities_matrix(
-		__isl_keep isl_basic_map *bmap, enum isl_dim_type c1,
-		enum isl_dim_type c2, enum isl_dim_type c3,
-		enum isl_dim_type c4, enum isl_dim_type c5);
-__isl_give isl_mat *isl_basic_map_inequalities_matrix(
-		__isl_keep isl_basic_map *bmap, enum isl_dim_type c1,
-		enum isl_dim_type c2, enum isl_dim_type c3,
-		enum isl_dim_type c4, enum isl_dim_type c5);
-__isl_give isl_basic_map *isl_basic_map_from_constraint_matrices(
-	__isl_take isl_space *dim,
-	__isl_take isl_mat *eq, __isl_take isl_mat *ineq, enum isl_dim_type c1,
-	enum isl_dim_type c2, enum isl_dim_type c3,
-	enum isl_dim_type c4, enum isl_dim_type c5);
 
 __isl_give isl_basic_map *isl_basic_map_from_aff(__isl_take isl_aff *aff);
 __isl_give isl_basic_map *isl_basic_map_from_multi_aff(
