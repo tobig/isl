@@ -149,6 +149,7 @@ static bool is_exported(Decl *decl)
 			N.find("band_member_set_coincident") != std::string::npos ||
 			N.find("band_member_get_coincident") != std::string::npos ||
 			N.find("insert_partial_schedule") != std::string::npos ||
+			N.find("isl_schedule_node_band_set_ast_build_options") != std::string::npos ||
 			N.find("from_domain_and_range") != std::string::npos)
 			return true;
 
