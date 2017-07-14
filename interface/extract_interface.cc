@@ -143,6 +143,9 @@ static bool is_exported(Decl *decl)
 	if (PollyExtensions && isa<FunctionDecl>(decl)) {
 		FunctionDecl *FDecl = cast<FunctionDecl>(decl);
 		std::string N = FDecl->getName();
+		if (	N.find("fold_get_domain") != std::string::npos)
+			return false;
+
 		if (	N.find("is_disjoint") != std::string::npos ||
 			N.find("get_domain") != std::string::npos ||
 			N.find("band_member_set_coincident") != std::string::npos ||
@@ -162,6 +165,7 @@ static bool is_exported(Decl *decl)
 			N.find("set_dim_name") == std::string::npos &&
 			N.find("_list_") == std::string::npos &&
 			N.find("_n_") == std::string::npos &&
+			N.find("isl_qpolynomial_substitute") == std::string::npos &&
 			N.find("from_constraint_matrices") == std::string::npos &&
 			N.find("partial_") == std::string::npos &&
 			N.find("total_dim") == std::string::npos &&
@@ -173,7 +177,12 @@ static bool is_exported(Decl *decl)
 			N.find("isl_space_tuple_match") == std::string::npos &&
 			N.find("isl_union_map_compute_flow") == std::string::npos &&
 			N.find("isl_val_gcdext") == std::string::npos &&
-			N.find("get_d") == std::string::npos &&
+			N.find("multiplicative_call") == std::string::npos &&
+			N.find("pw_qpolynomial_fold") == std::string::npos &&
+			N.find("fold") == std::string::npos &&
+			N.find("pw_qpolynomial_bound") == std::string::npos &&
+			N.find("fold_get") == std::string::npos &&
+			N.find("isl_val_get_d") == std::string::npos &&
 			N.find("compute_divs") == std::string::npos &&
 			N.find("dims_get_sign") == std::string::npos &&
 			N.find("basic_set_add") == std::string::npos &&

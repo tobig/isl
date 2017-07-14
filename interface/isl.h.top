@@ -21,6 +21,7 @@
 #include <isl/union_map.h>
 #include <isl/union_set.h>
 #include <isl/val.h>
+#include <isl/polynomial.h>
 
 #include <functional>
 #include <string>
