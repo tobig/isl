@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-struct isl_space;
+struct __isl_export isl_space;
 typedef struct isl_space isl_space;
 
 enum isl_dim_type {
@@ -32,10 +32,13 @@ enum isl_dim_type {
 };
 
 isl_ctx *isl_space_get_ctx(__isl_keep isl_space *dim);
+__isl_constructor
 __isl_give isl_space *isl_space_alloc(isl_ctx *ctx,
 			unsigned nparam, unsigned n_in, unsigned n_out);
+__isl_constructor
 __isl_give isl_space *isl_space_set_alloc(isl_ctx *ctx,
 			unsigned nparam, unsigned dim);
+__isl_constructor
 __isl_give isl_space *isl_space_params_alloc(isl_ctx *ctx, unsigned nparam);
 __isl_give isl_space *isl_space_copy(__isl_keep isl_space *dim);
 __isl_null isl_space *isl_space_free(__isl_take isl_space *space);
