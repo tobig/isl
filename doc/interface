@@ -1,0 +1,16 @@
+Design guidelines for the isl interfaces
+========================================
+
+# Constructors
+
+A given function that constructs an isl object can be exposed in two ways. As
+unnamed constructor and as a named static function. Aiming for an interface
+that is explicit and close to the isl C interface, all functions are exported
+as named static functions. The only exception are functions, where an unnamed
+constructor clearly identifies the object that is constructed. The set of
+exceptions that use unnamed constructors are:
+
+- Conversion constructors
+- Constructors from std::string
+- Constructors where all arguments by themselves uniquely identify
+  the object (e.g., isl_val_int_from_si)
