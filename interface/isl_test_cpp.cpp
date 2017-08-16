@@ -1,3 +1,9 @@
+/* Copyright 2016-2016 Tobias Grosser
+ *
+ * Use of this software is governed by the MIT license
+ *
+ * Written by Tobias Grosser, Weststrasse 47, CH-8003, Zurich
+ */
 #include <vector>
 #include <string>
 #include <limits.h>
