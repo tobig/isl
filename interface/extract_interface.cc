@@ -158,6 +158,7 @@ static bool is_exported(Decl *decl)
 
 		return (N.find("dump") == std::string::npos &&
 			N.find("get_ctx") == std::string::npos &&
+			N.find("stride_info") == std::string::npos &&
 			N.find("isl_ast_expr_or") == std::string::npos &&
 			N.find("foreach_ast_op_type") == std::string::npos &&
 			N.find("foreach_descendant_top_down") == std::string::npos &&
@@ -165,7 +166,6 @@ static bool is_exported(Decl *decl)
 			N.find("foreach_descendant_top_down") == std::string::npos &&
 			N.find("set_dim_name") == std::string::npos &&
 			N.find("_list_") == std::string::npos &&
-			N.find("_n_") == std::string::npos &&
 			N.find("isl_qpolynomial_substitute") == std::string::npos &&
 			N.find("from_constraint_matrices") == std::string::npos &&
 			N.find("partial_") == std::string::npos &&
