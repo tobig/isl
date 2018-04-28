@@ -1,6 +1,8 @@
 #include <isl/val.h>
 #include <isl/aff.h>
 #include <isl/set.h>
+#include <isl/space.h>
+#include <isl/id.h>
 #include <isl/map.h>
 #include <isl/ilp.h>
 #include <isl/union_set.h>
