@@ -144,7 +144,8 @@ static bool is_exported(Decl *decl)
 	if (PollyExtensions && isa<FunctionDecl>(decl)) {
 		FunctionDecl *FDecl = cast<FunctionDecl>(decl);
 		std::string N = FDecl->getName();
-		if (	N.find("fold_get_domain") != std::string::npos)
+		if (	N.find("fold_get_domain") != std::string::npos ||
+			N.find("fold_align_params") != std::string::npos)
 			return false;
 
 		if (	N.find("is_disjoint") != std::string::npos ||
@@ -153,6 +154,8 @@ static bool is_exported(Decl *decl)
 			N.find("band_member_get_coincident") != std::string::npos ||
 			N.find("insert_partial_schedule") != std::string::npos ||
 			N.find("isl_schedule_node_band_set_ast_build_options") != std::string::npos ||
+			N.find("align_params") != std::string::npos ||
+			N.find("gist_domain_params") != std::string::npos ||
 			N.find("from_domain_and_range") != std::string::npos)
 			return true;
 
@@ -164,6 +167,7 @@ static bool is_exported(Decl *decl)
 			N.find("foreach_descendant_top_down") == std::string::npos &&
 			N.find("foreach_schedule_node_top_down") == std::string::npos &&
 			N.find("foreach_descendant_top_down") == std::string::npos &&
+			N.find("set_dim_name") == std::string::npos &&
 			N.find("set_dim_name") == std::string::npos &&
 			N.find("_list_") == std::string::npos &&
 			N.find("isl_qpolynomial_substitute") == std::string::npos &&
@@ -188,10 +192,10 @@ static bool is_exported(Decl *decl)
 			N.find("dims_get_sign") == std::string::npos &&
 			N.find("basic_set_add") == std::string::npos &&
 			N.find("align_divs") == std::string::npos &&
-			N.find("n_div") == std::string::npos &&
-			N.find("n_in") == std::string::npos &&
-			N.find("n_out") == std::string::npos &&
-			N.find("n_param") == std::string::npos &&
+			N.find("_n_div") == std::string::npos &&
+			N.find("_n_in") == std::string::npos &&
+			N.find("_n_out") == std::string::npos &&
+			N.find("_n_param") == std::string::npos &&
 			N.find("fix_input_si") == std::string::npos &&
 			N.find("map_power") == std::string::npos &&
 			N.find("path_lengths") == std::string::npos &&
