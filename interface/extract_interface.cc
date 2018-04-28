@@ -99,7 +99,7 @@ static llvm::cl::opt<string> Language(llvm::cl::Required,
 	llvm::cl::value_desc("name"));
 
 static llvm::cl::opt<bool> PollyExtensions(
-	llvm::cl::init(false), "polly",
+	llvm::cl::init(true), "polly",
 	llvm::cl::desc("Generate Polly extensions for C++ bindings"));
 
 static const char *ResourceDir =
