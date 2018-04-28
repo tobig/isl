@@ -29,6 +29,7 @@ int isl_options_get_bound(isl_ctx *ctx);
 #define			ISL_ON_ERROR_WARN	0
 #define			ISL_ON_ERROR_CONTINUE	1
 #define			ISL_ON_ERROR_ABORT	2
+#define			ISL_ON_ERROR_USER	3
 isl_stat isl_options_set_on_error(isl_ctx *ctx, int val);
 int isl_options_get_on_error(isl_ctx *ctx);
 

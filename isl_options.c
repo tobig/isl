@@ -46,6 +46,7 @@ static struct isl_arg_choice on_error[] = {
 	{"warn",	ISL_ON_ERROR_WARN},
 	{"continue",	ISL_ON_ERROR_CONTINUE},
 	{"abort",	ISL_ON_ERROR_ABORT},
+	{"user",	ISL_ON_ERROR_USER},
 	{0}
 };
 

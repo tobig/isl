@@ -20,16 +20,34 @@ public:
   }
 };
 
-class error {
+/* Interface of an error handler which will be called in case a quota error
+ * occurs.
+ */
+class quota {
 public:
-  virtual void report() { }
-  bool report_bool() { return true; }
+  virtual bool report_bool() = 0;
 };
 
-class error_assume_inbounds {
+/* Indicate that when a quota-error occurs, the value that is returned
+ * by the boolean function will be ignored.
+ */
+class quota_ignore : public quota {
 public:
-  void report() {}
-  bool report_bool() {}
+  virtual bool report_bool() override { return true; }
+};
+
+/* Indicate that when a quota-error occurs, the value that a boolean "true"
+ * should be returned to abort the program execution as quick as possible.
+class quota_assume_true : public quota {
+public:
+  virtual bool report_bool() override { return true; }
+};
+
+/* Indicate that when a quota-error occurs, the value that a boolean "false"
+ * should be returned to abort the program execution as quick as possible.
+class quota_assume_false : public quota {
+public:
+  virtual bool report_bool() override { return false; }
 };
 
 }

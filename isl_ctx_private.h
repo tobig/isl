@@ -35,6 +35,10 @@ struct isl_ctx {
 	const char		*error_file;
 	int			error_line;
 
+	void 			(*error_user) (struct isl_ctx *,
+					enum isl_error, const char *,
+					const char *, int);
+
 	int			abort;
 
 	unsigned long		operations;

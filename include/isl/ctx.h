@@ -167,6 +167,9 @@ void isl_ctx_abort(isl_ctx *ctx);
 void isl_ctx_resume(isl_ctx *ctx);
 int isl_ctx_aborted(isl_ctx *ctx);
 
+void isl_ctx_set_on_error_user(isl_ctx *ctx, void (*error_user)
+	(struct isl_ctx *, enum isl_error, const char *, const char *, int));
+
 void isl_ctx_set_max_operations(isl_ctx *ctx, unsigned long max_operations);
 unsigned long isl_ctx_get_max_operations(isl_ctx *ctx);
 void isl_ctx_reset_operations(isl_ctx *ctx);

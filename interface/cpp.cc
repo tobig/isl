@@ -1113,11 +1113,11 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 			osprintf(os, ", ");
 	}
 
-	if (is_isl_stat(rettype) || is_isl_bool(rettype)) {
+	if (is_isl_bool(rettype)) {
 		if (num_params  - first_param > 0)
 			osprintf(os, ", ");
 
-		osprintf(os, "isl::error err");
+		osprintf(os, "isl::quota &quota");
 	}
 
 	osprintf(os, ")");

@@ -848,8 +848,8 @@ input variables and output variables.
 
 C<isl> supports different ways to react in case a runtime error is triggered.
 Runtime errors arise, e.g., if a function such as C<isl_map_intersect> is called
-with two maps that have incompatible spaces. There are three possible ways
-to react on error: to warn, to continue or to abort.
+with two maps that have incompatible spaces. There are four possible ways
+to react on error: to warn, to continue, to abort, or to call a user callback.
 
 The default behavior is to warn. In this mode, C<isl> prints a warning, stores
 the last error in the corresponding C<isl_ctx> and the function in which the
@@ -881,7 +881,7 @@ Another option is to continue on error. This is similar to warn on error mode,
 except that C<isl> does not print any warning. This allows a program to
 implement its own error reporting.
 
-The last option is to directly abort the execution of the program from within
+Another option is to directly abort the execution of the program from within
 the isl library. This makes it obviously impossible to recover from an error,
 but it allows to directly spot the error location. By aborting on error,
 debuggers break at the location the error occurred and can provide a stack
@@ -889,16 +889,30 @@ trace. Other tools that automatically provide stack traces on abort or that do
 not want to continue execution after an error was triggered may also prefer to
 abort on error.
 
+The last option is to call a user callback on error. This callback can then
+implement a user-specific error handling strategy. Potential use cases are: 1)
+logging all error messages into some file or buffer, 2) printing enhanced error
+messages (e.g., adding more descriptive stack traces), 3) only abort on some
+errors (e.g., continue on compute-out, but otherwise abort). In case no callback
+function is provided this option will emit a warning and abort.
+
 The on error behavior of isl can be specified by calling
 C<isl_options_set_on_error> or by setting the command line option
 C<--isl-on-error>. Valid arguments for the function call are
-C<ISL_ON_ERROR_WARN>, C<ISL_ON_ERROR_CONTINUE> and C<ISL_ON_ERROR_ABORT>. The
-choices for the command line option are C<warn>, C<continue> and C<abort>.
+C<ISL_ON_ERROR_WARN>, C<ISL_ON_ERROR_CONTINUE>, C<ISL_ON_ERROR_ABORT>
+and C<ISL_ON_ERROR_USER>. The choices for the command line option are C<warn>,
+C<continue>, C<abort> and C<user>.
+
 It is also possible to query the current error mode.
 
 	#include <isl/options.h>
 	isl_stat isl_options_set_on_error(isl_ctx *ctx, int val);
 	int isl_options_get_on_error(isl_ctx *ctx);
+
+The user-defined error reporting function is set with
+
+	#include <isl/options.h>
+	isl_stat isl_options_set_on_error_user(isl_ctx *ctx, int val);
 
 =head2 Identifiers
 

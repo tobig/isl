@@ -117,7 +117,25 @@ void isl_handle_error(isl_ctx *ctx, enum isl_error error, const char *msg,
 		fprintf(stderr, "%s:%d: %s\n", file, line, msg);
 		abort();
 		return;
+	case ISL_ON_ERROR_USER:
+		if (!ctx->error_user) {
+			fprintf(stderr, "No error callback found, aborting.\n");
+			fprintf(stderr, "%s:%d: %s\n", file, line, msg);
+			abort();
+			return;
+		}
+		ctx->error_user(ctx, error, msg, file, line);
+		return;
 	}
+}
+
+void isl_ctx_set_on_error_user(isl_ctx *ctx, void (*error_user)
+	(struct isl_ctx *, enum isl_error, const char *, const char *, int))
+{
+	if (!ctx)
+		return;
+
+	ctx->error_user = error_user;
 }
 
 static struct isl_options *find_nested_options(struct isl_args *args,
