@@ -188,11 +188,23 @@ static bool is_exported(Decl *decl)
 			N.find("dims_get_sign") == std::string::npos &&
 			N.find("basic_set_add") == std::string::npos &&
 			N.find("align_divs") == std::string::npos &&
+			N.find("n_div") == std::string::npos &&
+			N.find("n_in") == std::string::npos &&
+			N.find("n_out") == std::string::npos &&
+			N.find("n_param") == std::string::npos &&
 			N.find("fix_input_si") == std::string::npos &&
 			N.find("map_power") == std::string::npos &&
 			N.find("path_lengths") == std::string::npos &&
 			N.find("remove_inputs") == std::string::npos &&
+			N.find("isl_mat_col_add") == std::string::npos &&
+			N.find("isl_mat_extend") == std::string::npos &&
+			N.find("isl_mat_identity") == std::string::npos &&
+			N.find("isl_mat_left_hermite") == std::string::npos &&
 			N.find("read_from_file") == std::string::npos &&
+			N.find("every_descendant") == std::string::npos &&
+			N.find("remove_map_if") == std::string::npos &&
+			N.find("isl_vec_normalize") == std::string::npos &&
+			N.find("every_map") == std::string::npos &&
 			N.find("transitive_closure") == std::string::npos &&
 			N.find("disjoint") == std::string::npos &&
 			N.find("lift") == std::string::npos &&

@@ -109,7 +109,7 @@ typedef struct isl_ctx isl_ctx;
 /* Some helper macros */
 
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
-#define ISL_DEPRECATED	__attribute__((__deprecated__))
+#define ISL_DEPRECATED
 #else
 #define ISL_DEPRECATED
 #endif
