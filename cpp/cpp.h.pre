@@ -23,6 +23,8 @@ public:
 	}
 };
 
+#ifdef __EXCEPTIONS
+
 /* Class capturing isl errors.
  *
  * The what() return value is stored in a reference counted string
@@ -47,6 +49,7 @@ public:
 		return what_str->c_str();
 	}
 };
+
 
 /* Create an exception of a type described by "what_arg", with
  * error message "msg" in line "line" of file "file".
@@ -151,6 +154,72 @@ exception exception::create_from_last_error(isl::ctx ctx)
 
 	return create(error, msg, file, line);
 }
+
+#else // __EXCEPTIONS
+
+class abort {
+public:
+	static inline const char *get_error_string(isl_error error);
+	static inline void from_error_type(enum isl_error error,
+		const char *msg, const char *file, int line);
+	static inline void from_last_error(isl::ctx ctx);
+
+};
+
+const char *abort::get_error_string(enum isl_error error) {
+	switch (error) {
+	case isl_error_none:
+		break;
+	case isl_error_abort: return "execution aborted";
+	case isl_error_alloc: return "memory allocation failure";
+	case isl_error_unknown: return "unknown failure";
+	case isl_error_internal: return "internal error";
+	case isl_error_invalid: return "invalid argument";
+	case isl_error_quota: return "quota exceeded";
+	case isl_error_unsupported: return "unsupported operation";
+	}
+
+	return "invalid error type";
+}
+
+void abort::from_error_type(enum isl_error error, const char *msg,
+		const char *file, int line) {
+	const char *error_string;
+
+	error_string = get_error_string(error);
+
+	fprintf(stderr, "%s:%d [%s] %s\n", file, line, error_string, msg);
+
+	exit(1);
+}
+
+void abort::from_last_error(isl::ctx ctx) {
+	enum isl_error error;
+	const char *msg, *file;
+	int line;
+
+	error = isl_ctx_last_error(ctx.get());
+	msg = isl_ctx_last_error_msg(ctx.get());
+	file = isl_ctx_last_error_file(ctx.get());
+	line = isl_ctx_last_error_line(ctx.get());
+	isl_ctx_reset_error(ctx.get());
+
+	from_error_type(error, msg, file, line);
+}
+#endif
+
+
+#ifdef __EXCEPTIONS
+#define throw_or_abort(type, message, file, line) \
+	throw isl::exception::create(type, message, file, line)
+#define throw_or_abort_from_last_error(ctx) \
+	throw isl::exception::create_from_last_error(ctx)
+#else
+#define throw_or_abort(type, message, file, line) \
+	abort::from_error_type(type, message, file, line)
+#define throw_or_abort_from_last_error(ctx) \
+	abort::from_last_error(ctx)
+#endif
 
 /* Helper class for setting the on_error and resetting the option
  * to the original value when leaving the scope.

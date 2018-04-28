@@ -449,7 +449,7 @@ void cpp_generator::print_class_impl(ostream &os, const isl_class &clazz)
 static void print_throw_NULL_input(ostream &os)
 {
 	osprintf(os,
-	    "    throw isl::exception::create(isl_error_invalid,\n"
+	    "    throw_or_abort(isl_error_invalid,\n"
 	    "        \"NULL input\", __FILE__, __LINE__);\n");
 }
 
@@ -491,7 +491,7 @@ void cpp_generator::print_class_factory_impl(ostream &os,
 	if (!noexceptions) {
 		osprintf(os, "  if (!ptr)\n");
 		osprintf(os,
-			"    throw exception::create_from_last_error(ctx);\n");
+			"    throw_or_abort_from_last_error(ctx);\n");
 	}
 	osprintf(os, "  return %s(ptr);\n", cppname);
 	osprintf(os, "}\n");
@@ -531,7 +531,7 @@ void cpp_generator::print_public_constructors_impl(ostream &os,
 	if (!noexceptions) {
 		osprintf(os, "  if (obj.ptr && !ptr)\n");
 		osprintf(os,
-			"    throw exception::create_from_last_error("
+			"    throw_or_abort_from_last_error("
 			"%s_get_ctx(obj.ptr));\n",
 			name);
 	}
@@ -890,7 +890,7 @@ void cpp_generator::print_exceptional_execution_check(ostream &os,
 		osprintf(os, "  if (res < 0)\n");
 	else
 		osprintf(os, "  if (!res)\n");
-	osprintf(os, "    throw exception::create_from_last_error(");
+	osprintf(os, "    throw_or_abort_from_last_error(");
 	print_method_ctx(os, method, kind);
 	osprintf(os, ");\n");
 }
@@ -1219,6 +1219,7 @@ void cpp_generator::print_wrapped_call(ostream &os, const string &call)
 	if (noexceptions)
 		return print_wrapped_call_noexceptions(os, call);
 
+	osprintf(os, "#ifdef __EXCEPTIONS\n");
 	osprintf(os, "    try {\n");
 	osprintf(os, "      %s;\n", call.c_str());
 	osprintf(os, "      return isl_stat_ok;\n");
@@ -1226,6 +1227,10 @@ void cpp_generator::print_wrapped_call(ostream &os, const string &call)
 		     "      data->eptr = std::current_exception();\n");
 	osprintf(os, "      return isl_stat_error;\n");
 	osprintf(os, "    }\n");
+	osprintf(os, "#else\n");
+	osprintf(os, "    %s;\n", call.c_str());
+	osprintf(os, "    return isl_stat_ok;\n");
+	osprintf(os, "#endif\n");
 }
 
 /* Print the local variables that are needed for a callback argument,
