@@ -980,6 +980,14 @@ void cpp_generator::print_method_impl(ostream &os, const isl_class &clazz,
 	}
 	osprintf(os, ");\n");
 
+	if (noexceptions) {
+		if (is_isl_bool(return_type)) {
+			osprintf(os, "  if (res == isl_bool_error)\n");
+			osprintf(os, "    res = err.report_bool() ? isl_bool_true : isl_bool_false;\n");
+		}
+
+	}
+
 	print_exceptional_execution_check(os, method, kind);
 	if (kind == function_kind_constructor) {
 		osprintf(os, "  ptr = res;\n");
@@ -1047,7 +1055,8 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 	function_kind kind)
 {
 	string cname = fullname.substr(clazz.name.length() + 1);
-	string rettype_str = type2cpp(method->getReturnType());
+	QualType rettype = method->getReturnType();
+	string rettype_str = type2cpp(rettype);
 	string classname = type2cpp(clazz);
 	int num_params = method->getNumParams();
 	int first_param = 0;
@@ -1102,6 +1111,13 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 
 		if (i != num_params - 1)
 			osprintf(os, ", ");
+	}
+
+	if (is_isl_stat(rettype) || is_isl_bool(rettype)) {
+		if (num_params  - first_param > 0)
+			osprintf(os, ", ");
+
+		osprintf(os, "isl::error err");
 	}
 
 	osprintf(os, ")");
