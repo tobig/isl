@@ -20,35 +20,53 @@ public:
   }
 };
 
-/* Interface of an error handler which will be called in case a quota error
- * occurs.
+class quota_ignore;
+class quota_true;
+class quota_false;
+
+/* Interface of an error handler which is called in case of a quota error.
  */
 class quota {
 public:
+  static quota_ignore ignore;
+  static quota_true ret_true;
+  static quota_false ret_false;
+
+  /* Report an error for a function with return type 'bool'.
+   *
+   * The value returned by this function is forwarded as return value of the
+   * function triggering the error.
+   */
   virtual bool report_bool() = 0;
 };
 
 /* Indicate that when a quota-error occurs, the value that is returned
- * by the boolean function will be ignored.
+ * by the function triggering the error is ignored.
  */
 class quota_ignore : public quota {
 public:
   virtual bool report_bool() override { return true; }
 };
 
-/* Indicate that when a quota-error occurs, the value that a boolean "true"
- * should be returned to abort the program execution as quick as possible.
-class quota_assume_true : public quota {
+/* Indicate that when a quota-error occurs, the value that is returned
+ * by the function triggering the error is "true".
+ */
+class quota_true : public quota {
 public:
   virtual bool report_bool() override { return true; }
 };
 
-/* Indicate that when a quota-error occurs, the value that a boolean "false"
- * should be returned to abort the program execution as quick as possible.
-class quota_assume_false : public quota {
+/* Indicate that when a quota-error occurs, the value that is returned
+ * by the function triggering the error is "false".
+ */
+class quota_false : public quota {
 public:
   virtual bool report_bool() override { return false; }
 };
+
+quota_ignore quota::ignore;
+quota_true quota::ret_true;
+quota_false quota::ret_false;
 
 }
 } // namespace isl

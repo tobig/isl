@@ -983,7 +983,9 @@ void cpp_generator::print_method_impl(ostream &os, const isl_class &clazz,
 	if (noexceptions) {
 		if (is_isl_bool(return_type)) {
 			osprintf(os, "  if (res == isl_bool_error)\n");
-			osprintf(os, "    res = err.report_bool() ? isl_bool_true : isl_bool_false;\n");
+			osprintf(os, "    res = quota.report_bool() ? "
+				          " isl_bool_true :"
+                                          " isl_bool_false;\n");
 		}
 
 	}
