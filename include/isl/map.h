@@ -28,23 +28,16 @@
 extern "C" {
 #endif
 
-ISL_DEPRECATED
 unsigned isl_basic_map_n_in(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_out(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_param(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_div(__isl_keep const isl_basic_map *bmap);
 unsigned isl_basic_map_total_dim(__isl_keep const isl_basic_map *bmap);
 unsigned isl_basic_map_dim(__isl_keep isl_basic_map *bmap,
 				enum isl_dim_type type);
 
-ISL_DEPRECATED
 unsigned isl_map_n_in(__isl_keep const isl_map *map);
-ISL_DEPRECATED
 unsigned isl_map_n_out(__isl_keep const isl_map *map);
-ISL_DEPRECATED
 unsigned isl_map_n_param(__isl_keep const isl_map *map);
 __isl_polly_export
 unsigned isl_map_dim(__isl_keep isl_map *map, enum isl_dim_type type);
@@ -567,7 +560,6 @@ __isl_give isl_map *isl_map_uncurry(__isl_take isl_map *map);
 __isl_give isl_map *isl_map_make_disjoint(__isl_take isl_map *map);
 __isl_give isl_map *isl_basic_map_compute_divs(__isl_take isl_basic_map *bmap);
 __isl_give isl_map *isl_map_compute_divs(__isl_take isl_map *map);
-ISL_DEPRECATED
 __isl_give isl_map *isl_map_align_divs(__isl_take isl_map *map);
 
 __isl_give isl_basic_map *isl_basic_map_drop_constraints_involving_dims(
