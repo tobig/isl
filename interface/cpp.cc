@@ -160,7 +160,6 @@ void cpp_generator::print_class(ostream &os, const isl_class &clazz)
 	osprintf(os, "// declarations for isl::%s\n", cppname);
 
 	print_class_factory_decl(os, clazz);
-	print_class_global_constructor_proxy(os, clazz);
 	osprintf(os, "\n");
 	osprintf(os, "class %s {\n", cppname);
 	print_class_factory_decl(os, clazz, "  friend ");
@@ -223,18 +222,6 @@ void cpp_generator::print_class_factory_decl(ostream &os,
 	os << prefix;
 	osprintf(os, "inline isl::%s manage_copy(__isl_keep %s *ptr);\n",
 		cppname, name);
-}
-
-void cpp_generator::print_class_global_constructor_proxy(ostream &os,
-	const isl_class &clazz)
-{
-	if (!polly_extensions)
-		return;
-
-	const char *name = clazz.name.c_str();
-	std::string cppstring = type2cpp(clazz);
-	const char *cppname = cppstring.c_str();
-	osprintf(os, "inline isl::%s give(__isl_take %s *ptr);\n\n", cppname, name);
 }
 
 /* Print declarations of private constructors for class "clazz" to "os".
@@ -385,8 +372,6 @@ void cpp_generator::print_ptr_decl(ostream &os, const isl_class &clazz)
 	osprintf(os, "  inline __isl_give %s *release();\n", name);
 	osprintf(os, "  inline bool is_null() const;\n");
 	if (polly_extensions) {
-		osprintf(os, "  inline __isl_keep %s *keep() const;\n", name);
-		osprintf(os, "  inline __isl_give %s *take();\n", name);
 		osprintf(os, "  inline explicit operator bool() const;\n", name);
 	}
 }
@@ -661,12 +646,6 @@ void cpp_generator::print_ptr_impl(ostream &os, const isl_class &clazz)
 	osprintf(os, "  return ptr == nullptr;\n");
 	osprintf(os, "}\n");
 	if (polly_extensions) {
-		osprintf(os, "__isl_keep %s *%s::keep() const {\n", name, cppname);
-		osprintf(os, "  return get();\n");
-		osprintf(os, "}\n\n");
-		osprintf(os, "__isl_give %s *%s::take() {\n", name, cppname);
-		osprintf(os, "  return release();\n");
-		osprintf(os, "}\n\n");
 		osprintf(os, "%s::operator bool() const {\n", cppname);
 		osprintf(os, "  return !is_null();\n");
 		osprintf(os, "}\n\n");
