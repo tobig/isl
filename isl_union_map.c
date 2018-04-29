@@ -4132,6 +4132,133 @@ __isl_give isl_basic_set_list *isl_union_set_get_basic_set_list(
 	return list;
 }
 
+/* Return the total number of basic maps in "umap".
+ */
+int isl_union_map_n_basic_map(__isl_keep isl_union_map *umap)
+{
+	int n = 0;
+
+	if (isl_union_map_foreach_map(umap, &add_n, &n) < 0)
+		return -1;
+
+	return n;
+}
+
+/* Add the basic maps in "map" to "list".
+ */
+static isl_stat add_list_bmap_from_map(__isl_take isl_map *map, void *user)
+{
+	isl_basic_map_list **list = user;
+	isl_basic_map_list *list_i;
+
+	list_i = isl_map_get_basic_map_list(map);
+	*list = isl_basic_map_list_concat(*list, list_i);
+	isl_map_free(map);
+
+	if (!*list)
+		return isl_stat_error;
+	return isl_stat_ok;
+}
+
+/* Return a list containing all the basic maps in "umap".
+ *
+ * First construct a list of the appropriate size and
+ * then add all the elements.
+ */
+__isl_give isl_basic_map_list *isl_union_map_get_basic_map_list(
+	__isl_keep isl_union_map *umap)
+{
+	int n;
+	isl_ctx *ctx;
+	isl_basic_map_list *list;
+
+	if (!umap)
+		return NULL;
+	ctx = isl_union_map_get_ctx(umap);
+	n = isl_union_map_n_basic_map(umap);
+	if (n < 0)
+		return NULL;
+	list = isl_basic_map_list_alloc(ctx, n);
+	if (isl_union_map_foreach_map(umap, &add_list_bmap_from_map, &list) < 0)
+		list = isl_basic_map_list_free(list);
+
+	return list;
+}
+
+/* Add "set" to "list".
+ */
+static isl_stat add_list_set(__isl_take isl_set *set, void *user)
+{
+	isl_set_list **list = user;
+
+	*list = isl_set_list_add(*list, set);
+
+	if (!*list)
+		return isl_stat_error;
+	return isl_stat_ok;
+}
+
+/* Return the sets in "uset" as a list.
+ *
+ * First construct a list of the appropriate size and
+ * then add all the elements.
+ */
+__isl_give isl_set_list *isl_union_set_get_set_list(
+	__isl_keep isl_union_set *uset)
+{
+	int n_sets;
+	isl_ctx *ctx;
+	isl_set_list *list;
+
+	if (!uset)
+		return NULL;
+	ctx = isl_union_set_get_ctx(uset);
+	n_sets = isl_union_set_n_set(uset);
+	list = isl_set_list_alloc(ctx, n_sets);
+
+	if (isl_union_set_foreach_set(uset, &add_list_set, &list) < 0)
+		list = isl_set_list_free(list);
+
+	return list;
+}
+
+/* Add "map" to "list".
+ */
+static isl_stat add_list_map(__isl_take isl_map *map, void *user)
+{
+	isl_map_list **list = user;
+
+	*list = isl_map_list_add(*list, map);
+
+	if (!*list)
+		return isl_stat_error;
+	return isl_stat_ok;
+}
+
+/* Return the maps in "umap" as a list.
+ *
+ * First construct a list of the appropriate size and
+ * then add all the elements.
+ */
+__isl_give isl_map_list *isl_union_map_get_map_list(
+	__isl_keep isl_union_map *umap)
+{
+	int n_maps;
+	isl_ctx *ctx;
+	isl_map_list *list;
+
+	if (!umap)
+		return NULL;
+	ctx = isl_union_map_get_ctx(umap);
+	n_maps = isl_union_map_n_map(umap);
+	list = isl_map_list_alloc(ctx, n_maps);
+
+	if (isl_union_map_foreach_map(umap, &add_list_map, &list) < 0)
+		list = isl_map_list_free(list);
+
+	return list;
+}
+
 /* Internal data structure for isl_union_map_remove_map_if.
  * "fn" and "user" are the arguments to isl_union_map_remove_map_if.
  */

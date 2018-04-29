@@ -525,6 +525,173 @@ static int test_bounded(isl_ctx *ctx)
 	return 0;
 }
 
+/* Check that the conversion form isl objects to lists works as expected.
+ */
+static int test_get_list(isl_ctx *ctx)
+{
+	int i;
+	int equal;
+	isl_set *set, *set2;
+	isl_union_set *uset, *uset2;
+	isl_set_list *set_list;
+	isl_basic_set_list *bset_list;
+	isl_map *map, *map2;
+	isl_union_map *umap, *umap2;
+	isl_map_list *map_list;
+	isl_basic_map_list *bmap_list;
+
+	set = isl_set_read_from_str(ctx, "{ [0] ; [2] ; [3] }");
+	bset_list = isl_set_get_basic_set_list(set);
+
+	set2 = isl_set_empty(isl_set_get_space(set));
+
+	for (i = 0; i < isl_basic_set_list_n(bset_list); i++) {
+		isl_basic_set *bset;
+		bset = isl_basic_set_list_get(bset_list, i);
+		set2 = isl_set_union(set2, isl_set_from_basic_set(bset));
+	}
+
+	equal = isl_set_is_equal(set, set2);
+
+	isl_set_free(set);
+	isl_set_free(set2);
+	isl_basic_set_list_free(bset_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "sets are not equal",
+			return -1);
+
+	uset = isl_union_set_read_from_str(ctx, "{ A[0] ; B[2] ; B[3] }");
+	bset_list = isl_union_set_get_basic_set_list(uset);
+
+	uset2 = isl_union_set_empty(isl_union_set_get_space(uset));
+
+	for (i = 0; i < isl_basic_set_list_n(bset_list); i++) {
+		isl_basic_set *bset;
+		bset = isl_basic_set_list_get(bset_list, i);
+		uset2 = isl_union_set_union(uset2,
+				isl_union_set_from_basic_set(bset));
+	}
+
+	equal = isl_union_set_is_equal(uset, uset2);
+
+	isl_union_set_free(uset);
+	isl_union_set_free(uset2);
+	isl_basic_set_list_free(bset_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "sets are not equal",
+			return -1);
+
+	uset = isl_union_set_read_from_str(ctx, "{ A[0] ; B[2] ; B[3] }");
+	set_list = isl_union_set_get_set_list(uset);
+
+	uset2 = isl_union_set_empty(isl_union_set_get_space(uset));
+
+	for (i = 0; i < isl_set_list_n(set_list); i++) {
+		set = isl_set_list_get(set_list, i);
+		uset2 = isl_union_set_union(uset2,
+				isl_union_set_from_set(set));
+	}
+
+	equal = isl_union_set_is_equal(uset, uset2);
+
+	isl_union_set_free(uset);
+	isl_union_set_free(uset2);
+	isl_set_list_free(set_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "sets are not equal",
+			return -1);
+
+	map = isl_map_read_from_str(ctx,
+		"{ [0] -> [0]; [2] -> [0]; [3] -> [0] }");
+	bmap_list = isl_map_get_basic_map_list(map);
+
+	map2 = isl_map_empty(isl_map_get_space(map));
+
+	for (i = 0; i < isl_basic_map_list_n(bmap_list); i++) {
+		isl_basic_map *bmap;
+		bmap = isl_basic_map_list_get(bmap_list, i);
+		map2 = isl_map_union(map2, isl_map_from_basic_map(bmap));
+	}
+
+	equal = isl_map_is_equal(map, map2);
+
+	isl_map_free(map);
+	isl_map_free(map2);
+	isl_basic_map_list_free(bmap_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "maps are not equal",
+			return -1);
+
+	umap = isl_union_map_read_from_str(ctx,
+		"{ A[0] -> [0]; B[2] -> [0]; B[3] -> [0] }");
+	bmap_list = isl_union_map_get_basic_map_list(umap);
+
+	umap2 = isl_union_map_empty(isl_union_map_get_space(umap));
+
+	for (i = 0; i < isl_basic_map_list_n(bmap_list); i++) {
+		isl_basic_map *bmap;
+		bmap = isl_basic_map_list_get(bmap_list, i);
+		umap2 = isl_union_map_union(umap2,
+				isl_union_map_from_basic_map(bmap));
+	}
+
+	equal = isl_union_map_is_equal(umap, umap2);
+
+	isl_union_map_free(umap);
+	isl_union_map_free(umap2);
+	isl_basic_map_list_free(bmap_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "maps are not equal",
+			return -1);
+
+	umap = isl_union_map_read_from_str(ctx,
+		"{ A[0] -> [0]; B[2] -> [0]; B[3] -> [0] }");
+	map_list = isl_union_map_get_map_list(umap);
+
+	umap2 = isl_union_map_empty(isl_union_map_get_space(umap));
+
+	for (i = 0; i < isl_map_list_n(map_list); i++) {
+		map = isl_map_list_get(map_list, i);
+		umap2 = isl_union_map_union(umap2,
+				isl_union_map_from_map(map));
+	}
+
+	equal = isl_union_map_is_equal(umap, umap2);
+
+	isl_union_map_free(umap);
+	isl_union_map_free(umap2);
+	isl_map_list_free(map_list);
+
+	if (equal < 0)
+		return -1;
+
+	if (!equal)
+		isl_die(ctx, isl_error_unknown, "maps are not equal",
+			return -1);
+
+	return 0;
+}
+
 /* Construct the basic set { [i] : 5 <= i <= N } */
 static int test_construction_1(isl_ctx *ctx)
 {
@@ -9019,6 +9186,7 @@ struct {
 	{ "dataflow analysis", &test_dep },
 	{ "reading", &test_read },
 	{ "bounded", &test_bounded },
+	{ "get lists", &test_get_list },
 	{ "construction", &test_construction },
 	{ "dimension manipulation", &test_dim },
 	{ "map application", &test_application },
