@@ -20,17 +20,26 @@ public:
   }
 };
 
+template<typename T>
 class quota_ignore;
+template<typename T>
 class quota_true;
+template<typename T>
 class quota_false;
+template<typename T>
+class quota_unclear;
 
 /* Interface of an error handler which is called in case of a quota error.
  */
-class quota {
+template<typename T>
+class quotaBase {
 public:
-  static quota_ignore ignore;
-  static quota_true ret_true;
-  static quota_false ret_false;
+  static quota_ignore<T> ignore;
+  static quota_true<T> ret_true;
+  static quota_false<T> ret_false;
+  static quota_unclear<T> unclear;
+
+  virtual ~quotaBase() = default;
 
   /* Report an error for a function with return type 'bool'.
    *
@@ -43,7 +52,8 @@ public:
 /* Indicate that when a quota-error occurs, the value that is returned
  * by the function triggering the error is ignored.
  */
-class quota_ignore : public quota {
+template<typename T>
+class quota_ignore : public quotaBase<T> {
 public:
   virtual bool report_bool() override { return true; }
 };
@@ -51,7 +61,8 @@ public:
 /* Indicate that when a quota-error occurs, the value that is returned
  * by the function triggering the error is "true".
  */
-class quota_true : public quota {
+template<typename T>
+class quota_true : public quotaBase<T> {
 public:
   virtual bool report_bool() override { return true; }
 };
@@ -59,14 +70,31 @@ public:
 /* Indicate that when a quota-error occurs, the value that is returned
  * by the function triggering the error is "false".
  */
-class quota_false : public quota {
+template<typename T>
+class quota_false : public quotaBase<T> {
 public:
   virtual bool report_bool() override { return false; }
 };
 
-quota_ignore quota::ignore;
-quota_true quota::ret_true;
-quota_false quota::ret_false;
+/* Indicate that when a quota-error occurs, that I did not yet think about
+ * this.
+ */
+template<typename T>
+class quota_unclear : public quotaBase<T> {
+public:
+  virtual bool report_bool() override { return false; }
+};
+
+template<typename T>
+quota_ignore<T> quotaBase<T>::ignore;
+template<typename T>
+quota_true<T> quotaBase<T>::ret_true;
+template<typename T>
+quota_false<T> quotaBase<T>::ret_false;
+template<typename T>
+quota_unclear<T> quotaBase<T>::unclear;
+
+using quota = quotaBase<void>;
 
 enum class dim {
   cst = isl_dim_cst,
