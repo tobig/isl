@@ -35,6 +35,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <stdlib.h>
 #ifdef HAVE_ADT_OWNINGPTR_H
 #include <llvm/ADT/OwningPtr.h>
 #else
@@ -76,6 +77,7 @@
 #include "extract_interface.h"
 #include "generator.h"
 #include "python.h"
+#include "cpp.h"
 
 using namespace std;
 using namespace clang;
@@ -95,6 +97,10 @@ static llvm::cl::opt<string> Language(llvm::cl::Required,
 	llvm::cl::ValueRequired, "language",
 	llvm::cl::desc("Bindings to generate"),
 	llvm::cl::value_desc("name"));
+
+static llvm::cl::opt<bool> PollyExtensions(
+	llvm::cl::init(true), "polly",
+	llvm::cl::desc("Generate Polly extensions for C++ bindings"));
 
 static const char *ResourceDir =
 	CLANG_PREFIX "/lib/clang/" CLANG_VERSION_STRING;
@@ -120,10 +126,124 @@ bool has_annotation(Decl *decl, const char *name)
 	return false;
 }
 
+/* Is decl marked as exported for Polly?
+ */
+static bool is_polly(Decl *decl)
+{
+	return true;
+	return has_annotation(decl, "isl_polly");
+}
+
 /* Is decl marked as exported?
  */
 static bool is_exported(Decl *decl)
 {
+	if (is_polly(decl) && !PollyExtensions)
+		return false;
+
+	if (PollyExtensions && isa<FunctionDecl>(decl)) {
+		FunctionDecl *FDecl = cast<FunctionDecl>(decl);
+		std::string N = FDecl->getName();
+		if (	N.find("fold_get_domain") != std::string::npos ||
+			N.find("fold_align_params") != std::string::npos)
+			return false;
+
+		if (	N.find("is_disjoint") != std::string::npos ||
+			N.find("get_domain") != std::string::npos ||
+			N.find("band_member_set_coincident") != std::string::npos ||
+			N.find("band_member_get_coincident") != std::string::npos ||
+			N.find("insert_partial_schedule") != std::string::npos ||
+			N.find("isl_schedule_node_band_set_ast_build_options") != std::string::npos ||
+			N.find("align_params") != std::string::npos ||
+			N.find("gist_domain_params") != std::string::npos ||
+			N.find("from_domain_and_range") != std::string::npos)
+			return true;
+
+		return (N.find("dump") == std::string::npos &&
+			N.find("get_ctx") == std::string::npos &&
+			N.find("stride_info") == std::string::npos &&
+			N.find("isl_ast_expr_or") == std::string::npos &&
+			N.find("foreach_ast_op_type") == std::string::npos &&
+			N.find("foreach_descendant_top_down") == std::string::npos &&
+			N.find("foreach_schedule_node_top_down") == std::string::npos &&
+			N.find("foreach_descendant_top_down") == std::string::npos &&
+			N.find("set_dim_name") == std::string::npos &&
+			N.find("set_dim_name") == std::string::npos &&
+			N.find("_list_") == std::string::npos &&
+			N.find("isl_qpolynomial_substitute") == std::string::npos &&
+			N.find("from_constraint_matrices") == std::string::npos &&
+			N.find("partial_") == std::string::npos &&
+			N.find("total_dim") == std::string::npos &&
+			N.find("compare_at") == std::string::npos &&
+			N.find("map_descendant_bottom_up") == std::string::npos &&
+			N.find("isl_space_drop_outputs") == std::string::npos &&
+			N.find("isl_space_extend") == std::string::npos &&
+			N.find("isl_space_match") == std::string::npos &&
+			N.find("isl_space_tuple_match") == std::string::npos &&
+			N.find("isl_union_map_compute_flow") == std::string::npos &&
+			N.find("isl_val_gcdext") == std::string::npos &&
+			N.find("multiplicative_call") == std::string::npos &&
+			N.find("pw_qpolynomial_fold") == std::string::npos &&
+			N.find("fold") == std::string::npos &&
+			N.find("pw_qpolynomial_bound") == std::string::npos &&
+			N.find("fold_get") == std::string::npos &&
+			N.find("isl_val_get_d") == std::string::npos &&
+			N.find("compute_divs") == std::string::npos &&
+			N.find("dims_get_sign") == std::string::npos &&
+			N.find("basic_set_add") == std::string::npos &&
+			N.find("align_divs") == std::string::npos &&
+			N.find("_n_div") == std::string::npos &&
+			N.find("_n_in") == std::string::npos &&
+			N.find("_n_out") == std::string::npos &&
+			N.find("_n_param") == std::string::npos &&
+			N.find("fix_input_si") == std::string::npos &&
+			N.find("map_power") == std::string::npos &&
+			N.find("path_lengths") == std::string::npos &&
+			N.find("remove_inputs") == std::string::npos &&
+			N.find("isl_mat_col_add") == std::string::npos &&
+			N.find("isl_mat_extend") == std::string::npos &&
+			N.find("isl_mat_identity") == std::string::npos &&
+			N.find("isl_mat_left_hermite") == std::string::npos &&
+			N.find("read_from_file") == std::string::npos &&
+			N.find("every_descendant") == std::string::npos &&
+			N.find("remove_map_if") == std::string::npos &&
+			N.find("isl_vec_normalize") == std::string::npos &&
+			N.find("every_map") == std::string::npos &&
+			N.find("transitive_closure") == std::string::npos &&
+			N.find("disjoint") == std::string::npos &&
+			N.find("lift") == std::string::npos &&
+			N.find("isl_val_get_abs_num_chunks") == std::string::npos &&
+			N.find("isl_val_int_from_chunks") == std::string::npos &&
+			N.find("isl_ast_build_set") == std::string::npos &&
+			N.find("copy") == std::string::npos &&
+			N.find("try_get") == std::string::npos &&
+			N.find("get_parent_type") == std::string::npos &&
+			N.find("isl_basic_set_has_defining_inequalities") == std::string::npos &&
+			N.find("isl_basic_map_has_defining_equality") == std::string::npos &&
+			N.find("isl_constraint_dim") == std::string::npos &&
+			N.find("isl_basic_set_has_defining_equality") == std::string::npos &&
+			N.find("isl_constraint_is_equal") == std::string::npos &&
+			N.find("isl_constraint_negate") == std::string::npos &&
+			N.find("isl_constraint_cow") == std::string::npos &&
+			N.find("isl_set_fix_dim_si") == std::string::npos &&
+			N.find("isl_set_eliminate_dims") == std::string::npos &&
+			N.find("isl_set_get_hash") == std::string::npos &&
+			N.find("isl_space_drop_inputs") == std::string::npos &&
+			N.find("dim_residue_class_val") == std::string::npos &&
+			N.find("map_schedule_node_bottom_up") == std::string::npos &&
+			N.find("void") == std::string::npos &&
+			N.find("to_str") == std::string::npos &&
+			N.find("foreach_scc") == std::string::npos &&
+			N.find("set_free_user") == std::string::npos &&
+			N.find("and") == std::string::npos &&
+			N.find("get_op_type") == std::string::npos &&
+			N.find("get_type") == std::string::npos &&
+			N.find("apply_multi_aff") == std::string::npos &&
+			N.find("free") == std::string::npos &&
+			N.find("delete") == std::string::npos &&
+			N.find("print") == std::string::npos);
+	}
+
 	return has_annotation(decl, "isl_export");
 }
 
@@ -393,6 +513,31 @@ static void set_invocation(CompilerInstance *Clang,
 
 #endif
 
+/* Create an interface generator for the selected language and
+ * then use it to generate the interface.
+ */
+static void generate(MyASTConsumer &consumer)
+{
+	generator *gen;
+
+	if (Language.compare("python") == 0) {
+		gen = new python_generator(consumer.exported_types,
+			consumer.exported_functions, consumer.functions);
+	} else if (Language.compare("cpp") == 0) {
+		gen = new cpp_generator(consumer.exported_types,
+			consumer.exported_functions, consumer.functions);
+	} else if (Language.compare("cpp-noexceptions") == 0) {
+		gen = new cpp_generator(consumer.exported_types,
+			consumer.exported_functions, consumer.functions, true);
+	} else {
+		cerr << "Language '" << Language << "' not recognized." << endl
+		     << "Not generating bindings." << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	gen->generate();
+}
+
 int main(int argc, char *argv[])
 {
 	llvm::cl::ParseCommandLineOptions(argc, argv);
@@ -421,11 +566,14 @@ int main(int argc, char *argv[])
 	PO.addMacroDef("__isl_give=__attribute__((annotate(\"isl_give\")))");
 	PO.addMacroDef("__isl_keep=__attribute__((annotate(\"isl_keep\")))");
 	PO.addMacroDef("__isl_take=__attribute__((annotate(\"isl_take\")))");
-	PO.addMacroDef("__isl_export=__attribute__((annotate(\"isl_export\")))");
+	PO.addMacroDef("__isl_export=__attribute__((annotate(\"isl_export\")))");;
+	PO.addMacroDef("__isl_polly_export=__attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
+	PO.addMacroDef("__isl_polly=__attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
 	PO.addMacroDef("__isl_overload="
 	    "__attribute__((annotate(\"isl_overload\"))) "
 	    "__attribute__((annotate(\"isl_export\")))");
 	PO.addMacroDef("__isl_constructor=__attribute__((annotate(\"isl_constructor\"))) __attribute__((annotate(\"isl_export\")))");
+	PO.addMacroDef("__isl_polly_constructor=__attribute__((annotate(\"isl_constructor\"))) __attribute__((annotate(\"isl_export\"))) __attribute__((annotate(\"isl_polly\")))");
 	PO.addMacroDef("__isl_subclass(super)=__attribute__((annotate(\"isl_subclass(\" #super \")\"))) __attribute__((annotate(\"isl_export\")))");
 
 	create_preprocessor(Clang);
@@ -445,20 +593,11 @@ int main(int argc, char *argv[])
 	ParseAST(*sema);
 	Diags.getClient()->EndSourceFile();
 
-	generator *gen = NULL;
-	if (Language.compare("python") == 0)
-		gen = new python_generator(consumer.exported_types,
-			consumer.exported_functions, consumer.functions);
-	else
-		cerr << "Language '" << Language << "' not recognized." << endl
-		     << "Not generating bindings." << endl;
-
-	if (gen)
-		gen->generate();
+	generate(consumer);
 
 	delete sema;
 	delete Clang;
 	llvm::llvm_shutdown();
 
-	return 0;
+	return EXIT_SUCCESS;
 }

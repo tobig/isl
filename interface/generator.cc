@@ -96,6 +96,7 @@ generator::generator(set<RecordDecl *> &exported_types,
 		classes[name].fn_to_str = find_by_name(name + "_to_str", false);
 		classes[name].fn_copy = find_by_name(name + "_copy", true);
 		classes[name].fn_free = find_by_name(name + "_free", true);
+		classes[name].fn_dump = find_by_name(name + "_dump", false);
 	}
 
 	for (in = exported_functions.begin(); in != exported_functions.end();
@@ -171,6 +172,10 @@ bool generator::is_overload(Decl *decl)
  */
 bool generator::is_constructor(Decl *decl)
 {
+	FunctionDecl *FDecl = cast<FunctionDecl>(decl);
+	std::string N = FDecl->getName();
+	if ((N.find("read_from_str") != std::string::npos))
+		return true;
 	return has_annotation(decl, "isl_constructor");
 }
 

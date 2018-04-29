@@ -19,7 +19,7 @@ extern "C" {
 
 #define ISL_DECLARE_LIST_TYPE(EL)					\
 struct isl_##EL;							\
-struct isl_##EL##_list;							\
+struct __isl_polly_export isl_##EL##_list;				\
 typedef struct isl_##EL##_list isl_##EL##_list;
 #define ISL_DECLARE_LIST_FN(EL)						\
 isl_ctx *isl_##EL##_list_get_ctx(__isl_keep isl_##EL##_list *list);	\

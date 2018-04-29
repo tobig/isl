@@ -395,6 +395,7 @@ __isl_give isl_basic_map *isl_basic_map_from_multi_aff2(
 	__isl_take isl_multi_aff *maff, int rational);
 
 struct isl_mat;
+typedef struct isl_mat isl_mat;
 
 __isl_give isl_basic_set *isl_basic_set_preimage(
 	__isl_take isl_basic_set *bset, __isl_take isl_mat *mat);

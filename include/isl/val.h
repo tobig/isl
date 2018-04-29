@@ -62,6 +62,7 @@ __isl_export
 __isl_give isl_val *isl_val_ceil(__isl_take isl_val *v);
 __isl_export
 __isl_give isl_val *isl_val_trunc(__isl_take isl_val *v);
+__isl_polly_export
 __isl_give isl_val *isl_val_2exp(__isl_take isl_val *v);
 __isl_export
 __isl_give isl_val *isl_val_min(__isl_take isl_val *v1, __isl_take isl_val *v2);
@@ -69,9 +70,11 @@ __isl_export
 __isl_give isl_val *isl_val_max(__isl_take isl_val *v1, __isl_take isl_val *v2);
 __isl_export
 __isl_give isl_val *isl_val_add(__isl_take isl_val *v1, __isl_take isl_val *v2);
+__isl_polly
 __isl_give isl_val *isl_val_add_ui(__isl_take isl_val *v1, unsigned long v2);
 __isl_export
 __isl_give isl_val *isl_val_sub(__isl_take isl_val *v1, __isl_take isl_val *v2);
+__isl_polly_export
 __isl_give isl_val *isl_val_sub_ui(__isl_take isl_val *v1, unsigned long v2);
 __isl_export
 __isl_give isl_val *isl_val_mul(__isl_take isl_val *v1, __isl_take isl_val *v2);

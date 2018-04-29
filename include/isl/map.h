@@ -15,7 +15,6 @@
 #include <isl/ctx.h>
 #include <isl/space_type.h>
 #include <isl/vec.h>
-#include <isl/mat.h>
 #include <isl/printer.h>
 #include <isl/local_space.h>
 #include <isl/aff_type.h>
@@ -29,24 +28,18 @@
 extern "C" {
 #endif
 
-ISL_DEPRECATED
 unsigned isl_basic_map_n_in(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_out(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_param(__isl_keep const isl_basic_map *bmap);
-ISL_DEPRECATED
 unsigned isl_basic_map_n_div(__isl_keep const isl_basic_map *bmap);
 unsigned isl_basic_map_total_dim(__isl_keep const isl_basic_map *bmap);
 unsigned isl_basic_map_dim(__isl_keep isl_basic_map *bmap,
 				enum isl_dim_type type);
 
-ISL_DEPRECATED
 unsigned isl_map_n_in(__isl_keep const isl_map *map);
-ISL_DEPRECATED
 unsigned isl_map_n_out(__isl_keep const isl_map *map);
-ISL_DEPRECATED
 unsigned isl_map_n_param(__isl_keep const isl_map *map);
+__isl_polly_export
 unsigned isl_map_dim(__isl_keep isl_map *map, enum isl_dim_type type);
 
 isl_ctx *isl_basic_map_get_ctx(__isl_keep isl_basic_map *bmap);
@@ -121,6 +114,7 @@ __isl_give isl_basic_map *isl_basic_map_less_at(__isl_take isl_space *dim,
 __isl_give isl_basic_map *isl_basic_map_more_at(__isl_take isl_space *dim,
 	unsigned pos);
 __isl_give isl_basic_map *isl_basic_map_empty(__isl_take isl_space *space);
+__isl_polly_export
 __isl_give isl_basic_map *isl_basic_map_universe(__isl_take isl_space *space);
 __isl_give isl_basic_map *isl_basic_map_nat_universe(__isl_take isl_space *dim);
 __isl_give isl_basic_map *isl_basic_map_remove_redundancies(
@@ -203,6 +197,7 @@ __isl_give isl_printer *isl_printer_print_basic_map(
 __isl_give char *isl_map_to_str(__isl_keep isl_map *map);
 __isl_give isl_printer *isl_printer_print_map(__isl_take isl_printer *printer,
 	__isl_keep isl_map *map);
+__isl_polly_export
 __isl_give isl_basic_map *isl_basic_map_fix_si(__isl_take isl_basic_map *bmap,
 		enum isl_dim_type type, unsigned pos, int value);
 __isl_give isl_basic_map *isl_basic_map_fix_val(__isl_take isl_basic_map *bmap,
@@ -266,6 +261,7 @@ __isl_give isl_pw_multi_aff *isl_map_lexmax_pw_multi_aff(
 void isl_basic_map_print_internal(__isl_keep isl_basic_map *bmap,
 	FILE *out, int indent);
 
+__isl_polly
 __isl_give isl_val *isl_basic_map_plain_get_val_if_fixed(
 	__isl_keep isl_basic_map *bmap,
 	enum isl_dim_type type, unsigned pos);
@@ -421,9 +417,11 @@ __isl_give isl_basic_map *isl_basic_map_move_dims(
 __isl_give isl_map *isl_map_move_dims(__isl_take isl_map *map,
 	enum isl_dim_type dst_type, unsigned dst_pos,
 	enum isl_dim_type src_type, unsigned src_pos, unsigned n);
+__isl_polly
 __isl_give isl_basic_map *isl_basic_map_project_out(
 		__isl_take isl_basic_map *bmap,
 		enum isl_dim_type type, unsigned first, unsigned n);
+__isl_polly
 __isl_give isl_map *isl_map_project_out(__isl_take isl_map *map,
 		enum isl_dim_type type, unsigned first, unsigned n);
 __isl_give isl_basic_map *isl_basic_map_remove_divs(
@@ -504,6 +502,7 @@ __isl_give isl_basic_map *isl_basic_map_from_domain(
 	__isl_take isl_basic_set *bset);
 __isl_give isl_basic_map *isl_basic_map_from_range(
 	__isl_take isl_basic_set *bset);
+__isl_polly_export
 __isl_give isl_map *isl_map_from_range(__isl_take isl_set *set);
 __isl_give isl_basic_map *isl_basic_map_from_domain_and_range(
 	__isl_take isl_basic_set *domain, __isl_take isl_basic_set *range);
@@ -561,7 +560,6 @@ __isl_give isl_map *isl_map_uncurry(__isl_take isl_map *map);
 __isl_give isl_map *isl_map_make_disjoint(__isl_take isl_map *map);
 __isl_give isl_map *isl_basic_map_compute_divs(__isl_take isl_basic_map *bmap);
 __isl_give isl_map *isl_map_compute_divs(__isl_take isl_map *map);
-ISL_DEPRECATED
 __isl_give isl_map *isl_map_align_divs(__isl_take isl_map *map);
 
 __isl_give isl_basic_map *isl_basic_map_drop_constraints_involving_dims(
@@ -648,20 +646,6 @@ __isl_give isl_basic_map *isl_basic_map_drop_unused_params(
 	__isl_take isl_basic_map *bmap);
 __isl_give isl_map *isl_map_drop_unused_params(__isl_take isl_map *map);
 
-__isl_give isl_mat *isl_basic_map_equalities_matrix(
-		__isl_keep isl_basic_map *bmap, enum isl_dim_type c1,
-		enum isl_dim_type c2, enum isl_dim_type c3,
-		enum isl_dim_type c4, enum isl_dim_type c5);
-__isl_give isl_mat *isl_basic_map_inequalities_matrix(
-		__isl_keep isl_basic_map *bmap, enum isl_dim_type c1,
-		enum isl_dim_type c2, enum isl_dim_type c3,
-		enum isl_dim_type c4, enum isl_dim_type c5);
-__isl_give isl_basic_map *isl_basic_map_from_constraint_matrices(
-	__isl_take isl_space *dim,
-	__isl_take isl_mat *eq, __isl_take isl_mat *ineq, enum isl_dim_type c1,
-	enum isl_dim_type c2, enum isl_dim_type c3,
-	enum isl_dim_type c4, enum isl_dim_type c5);
-
 __isl_give isl_basic_map *isl_basic_map_from_aff(__isl_take isl_aff *aff);
 __isl_give isl_basic_map *isl_basic_map_from_multi_aff(
 	__isl_take isl_multi_aff *maff);
@@ -671,7 +655,9 @@ __isl_give isl_basic_map *isl_basic_map_from_aff_list(
 __isl_give isl_map *isl_map_from_aff(__isl_take isl_aff *aff);
 __isl_give isl_map *isl_map_from_multi_aff(__isl_take isl_multi_aff *maff);
 
+__isl_polly
 __isl_give isl_pw_aff *isl_map_dim_min(__isl_take isl_map *map, int pos);
+__isl_polly
 __isl_give isl_pw_aff *isl_map_dim_max(__isl_take isl_map *map, int pos);
 
 ISL_DECLARE_LIST_FN(basic_map)
