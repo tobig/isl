@@ -339,7 +339,6 @@ endif
 nodist_pkginclude_HEADERS = \
 	include/isl/stdint.h
 pkginclude_HEADERS = \
-	$(CPP_H) \
 	$(MP_INCLUDE_H) \
 	include/isl/aff.h \
 	include/isl/aff_type.h \
