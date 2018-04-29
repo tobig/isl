@@ -522,12 +522,6 @@ void cpp_generator::print_class_factory_impl(ostream &os,
 	}
 	osprintf(os, "  return %s(ptr);\n", cppname);
 	osprintf(os, "}\n");
-	if (polly_extensions) {
-		osprintf(os, "isl::%s give(__isl_take %s *ptr) {\n", cppname,
-			name);
-		osprintf(os, "  return manage(ptr);\n", cppname);
-		osprintf(os, "}\n\n");
-	}
 }
 
 /* Print implementations of private constructors for class "clazz" to "os".
