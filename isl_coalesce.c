@@ -2528,7 +2528,7 @@ static isl_stat shift_if_cst_int(struct isl_coalesce_info *info, int div,
 	}
 
 	isl_int_init(d);
-	r = isl_val_get_num_isl_int(c, &d);
+	r = (isl_stat)isl_val_get_num_isl_int(c, &d);
 	if (r >= 0)
 		r = shift_div(info, div, d);
 	isl_int_clear(d);
@@ -3143,7 +3143,7 @@ static enum isl_change coalesce_after_aligning_divs(
 
 	known = isl_basic_map_divs_known(bmap_i);
 	if (known < 0 || !known)
-		return known;
+		return (enum isl_change)known;
 
 	ctx = isl_basic_map_get_ctx(bmap_i);
 

@@ -53,7 +53,7 @@ S(UNION,foreach_group_data)
  */
 static isl_stat FN(UNION,call_on_group)(void **entry, void *user)
 {
-	S(UNION,group) *group = *entry;
+	S(UNION,group) *group = (S(UNION,group)*)*entry;
 	S(UNION,foreach_group_data) *data;
 
 	data = (S(UNION,foreach_group_data) *) user;
@@ -82,7 +82,7 @@ static isl_stat FN(UNION,foreach_group)(__isl_keep UNION *u,
 static isl_stat FN(UNION,count_part)(__isl_keep S(UNION,group) *group,
 	void *user)
 {
-	int *n = user;
+	int *n = (int*)user;
 
 	if (!group)
 		return isl_stat_error;
@@ -108,7 +108,7 @@ int FN(FN(UNION,n),PARTS)(__isl_keep UNION *u)
  */
 static isl_stat FN(UNION,free_group_entry)(void **entry, void *user)
 {
-	PART *part = *entry;
+	PART *part = (PART*)*entry;
 
 	FN(PART,free)(part);
 	return isl_stat_ok;
@@ -185,7 +185,7 @@ S(UNION,foreach_data)
 
 static isl_stat FN(UNION,call_on_copy)(void **entry, void *user)
 {
-	PART *part = *entry;
+	PART *part = (PART*)*entry;
 	S(UNION,foreach_data) *data = (S(UNION,foreach_data) *) user;
 
 	part = FN(PART,copy)(part);
@@ -263,7 +263,7 @@ static struct isl_hash_table_entry *FN(UNION,find_part_entry)(
 		group = FN(UNION,group_alloc)(domain, 1);
 		group_entry->data = group;
 	} else {
-		group = group_entry->data;
+		group = (S(UNION,group)*)group_entry->data;
 		if (reserve)
 			group = FN(UNION,group_cow)(group);
 	}
@@ -295,7 +295,7 @@ static __isl_give UNION *FN(UNION,remove_part_entry)(__isl_take UNION *u,
 	if (!u || !part_entry)
 		return FN(UNION,free)(u);
 
-	part = part_entry->data;
+	part = (PART*)part_entry->data;
 	ctx = FN(UNION,get_ctx)(u);
 	hash = isl_space_get_domain_hash(part->dim);
 	group_entry = isl_hash_table_find(ctx, &u->table, hash,
@@ -303,7 +303,7 @@ static __isl_give UNION *FN(UNION,remove_part_entry)(__isl_take UNION *u,
 	if (!group_entry)
 		isl_die(ctx, isl_error_internal, "missing group",
 			return FN(UNION,free)(u));
-	group = group_entry->data;
+	group = (S(UNION,group)*)group_entry->data;
 	isl_hash_table_remove(ctx, &group->part_table, part_entry);
 	FN(PART,free)(part);
 
@@ -340,8 +340,8 @@ static isl_bool FN(UNION,disjoint_domain)(__isl_keep PART *part1,
  */
 static isl_stat FN(UNION,check_disjoint_domain_entry)(void **entry, void *user)
 {
-	PART *part = user;
-	PART *other = *entry;
+	PART *part = (PART*)user;
+	PART *other = (PART*)*entry;
 	isl_bool equal;
 	isl_bool disjoint;
 
@@ -384,7 +384,7 @@ static isl_stat FN(UNION,check_disjoint_domain_other)(__isl_keep UNION *u,
 			    &FN(UNION,group_has_domain_space), part->dim, 0);
 	if (!group_entry)
 		return isl_stat_ok;
-	group = group_entry->data;
+	group = (S(UNION,group)*)group_entry->data;
 	return isl_hash_table_foreach(ctx, &group->part_table,
 			      &FN(UNION,check_disjoint_domain_entry), part);
 }
@@ -452,12 +452,12 @@ static isl_bool FN(UNION,has_single_reference)(__isl_keep UNION *u)
 {
 	if (!u)
 		return isl_bool_error;
-	return u->ref == 1;
+	return (isl_bool)(u->ref == 1);
 }
 
 static isl_stat FN(UNION,free_u_entry)(void **entry, void *user)
 {
-	S(UNION,group) *group = *entry;
+	S(UNION,group) *group = (S(UNION,group)*)*entry;
 	FN(UNION,group_free)(group);
 	return isl_stat_ok;
 }

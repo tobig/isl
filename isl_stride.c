@@ -204,7 +204,8 @@ error:
  */
 static isl_stat detect_stride(__isl_take isl_constraint *c, void *user)
 {
-	struct isl_detect_stride_data *data = user;
+	struct isl_detect_stride_data *data =
+                (struct isl_detect_stride_data *) user;
 	int i, n_div;
 	isl_ctx *ctx;
 	isl_stat r = isl_stat_ok;

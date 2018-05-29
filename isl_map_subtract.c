@@ -662,7 +662,7 @@ static isl_stat basic_map_is_empty_add(struct isl_diff_collector *dc,
 	struct isl_is_empty_diff_collector *edc;
 	edc = (struct isl_is_empty_diff_collector *)dc;
 
-	edc->empty = 0;
+	edc->empty = isl_bool_false;
 
 	isl_basic_map_free(bmap);
 	return isl_stat_error;
@@ -723,7 +723,7 @@ isl_bool isl_basic_map_plain_is_singleton(__isl_keep isl_basic_map *bmap)
 		return isl_bool_false;
 	if (bmap->n_ineq)
 		return isl_bool_false;
-	return bmap->n_eq == isl_basic_map_total_dim(bmap);
+	return (isl_bool)(bmap->n_eq == isl_basic_map_total_dim(bmap));
 }
 
 /* Return true if "map" contains a single element.

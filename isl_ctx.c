@@ -19,7 +19,7 @@
  */
 isl_bool isl_bool_not(isl_bool b)
 {
-	return b < 0 ? isl_bool_error : !b;
+	return (isl_bool)(b < 0 ? isl_bool_error : !b);
 }
 
 /* Check that the result of an allocation ("p") is not NULL and
@@ -127,7 +127,7 @@ static struct isl_options *find_nested_options(struct isl_args *args,
 	struct isl_options *options;
 
 	if (args == wanted)
-		return opt;
+		return (struct isl_options*)opt;
 
 	for (i = 0; args->args[i].type != isl_arg_end; ++i) {
 		struct isl_arg *arg = &args->args[i];

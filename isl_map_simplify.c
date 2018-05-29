@@ -160,8 +160,8 @@ static isl_bool needs_reduction(__isl_keep isl_basic_map *bmap, int div,
 		return isl_bool_false;
 
 	isl_int_mul_ui(bmap->div[div][1 + pos], bmap->div[div][1 + pos], 2);
-	r = isl_int_abs_ge(bmap->div[div][1 + pos], bmap->div[div][0]) &&
-	    !isl_int_eq(bmap->div[div][1 + pos], bmap->div[div][0]);
+	r = (isl_bool)(isl_int_abs_ge(bmap->div[div][1 + pos], bmap->div[div][0]) &&
+	    !isl_int_eq(bmap->div[div][1 + pos], bmap->div[div][0]));
 	isl_int_divexact_ui(bmap->div[div][1 + pos],
 			    bmap->div[div][1 + pos], 2);
 
@@ -733,7 +733,7 @@ static isl_bool constraint_index_is_redundant(struct isl_constraint_index *ci,
 	h = hash_index_ineq(ci, &ineq);
 	if (!ci->index[h])
 		return isl_bool_false;
-	return isl_int_ge(ineq[0], (*ci->index[h])[0]);
+	return (isl_bool)isl_int_ge(ineq[0], (*ci->index[h])[0]);
 }
 
 /* If we can eliminate more than one div, then we need to make
@@ -1110,7 +1110,7 @@ static isl_bool better_div_constraint(__isl_keep isl_basic_map *bmap,
 	last_div = isl_seq_last_non_zero(bmap->div[div] + 1,
 					 total + bmap->n_div);
 
-	return last_ineq < last_div;
+	return (isl_bool)(last_ineq < last_div);
 }
 
 /* Given two constraints "k" and "l" that are opposite to each other,
@@ -2538,19 +2538,19 @@ error:
 /* Project "bset" onto the variables that are involved in "template".
  */
 static __isl_give isl_basic_set *project_onto_involved(
-	__isl_take isl_basic_set *bset, __isl_keep isl_basic_set *template)
+	__isl_take isl_basic_set *bset, __isl_keep isl_basic_set *template2)
 {
 	int i, n;
 
-	if (!bset || !template)
+	if (!bset || !template2)
 		return isl_basic_set_free(bset);
 
-	n = isl_basic_set_dim(template, isl_dim_set);
+	n = isl_basic_set_dim(template2, isl_dim_set);
 
 	for (i = 0; i < n; ++i) {
 		isl_bool involved;
 
-		involved = isl_basic_set_involves_dims(template,
+		involved = isl_basic_set_involves_dims(template2,
 							isl_dim_set, i, 1);
 		if (involved < 0)
 			return isl_basic_set_free(bset);
@@ -4023,7 +4023,7 @@ static isl_bool test_ineq_is_satisfied(__isl_keep isl_basic_map *bmap,
 	res = isl_tab_min(data->tab, data->v->el, ctx->one, &data->g, NULL, 0);
 	if (res == isl_lp_error)
 		return isl_bool_error;
-	return res == isl_lp_ok && isl_int_is_nonneg(data->g);
+	return (isl_bool)(res == isl_lp_ok && isl_int_is_nonneg(data->g));
 }
 
 /* Given a lower and an upper bound on div i, do they always allow
@@ -4101,7 +4101,7 @@ static isl_bool int_between_bounds(__isl_keep isl_basic_map *bmap, int i,
 
 	isl_seq_gcd(data->v->el + 1, offset - 1 + n_div, &data->g);
 	if (isl_int_is_zero(data->g))
-		return isl_int_is_nonneg(data->fl);
+		return (isl_bool)isl_int_is_nonneg(data->fl);
 	if (isl_int_is_one(data->g)) {
 		isl_int_set(data->v->el[0], data->fl);
 		return test_ineq_is_satisfied(bmap, data);
@@ -4382,7 +4382,7 @@ static isl_bool is_opposite(__isl_keep isl_basic_map *bmap, int i, int j)
 	unsigned total;
 
 	total = isl_basic_map_dim(bmap, isl_dim_all);
-	return is_opposite_part(bmap, i, j, 1, total);
+	return (isl_bool)is_opposite_part(bmap, i, j, 1, total);
 }
 
 /* Are inequality constraints "i" and "j" of "bmap" equal to each other,

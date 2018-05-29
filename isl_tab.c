@@ -3472,7 +3472,7 @@ static isl_bool detect_constant_with_tmp(struct isl_tab *tab,
 	isl_seq_clr(eq->el + 1, tab->n_var);
 	isl_int_set_si(eq->el[1 + pos], -1);
 	isl_int_set(eq->el[0], *target);
-	r = isl_tab_add_eq(tab, eq->el);
+	r = (isl_stat)isl_tab_add_eq(tab, eq->el);
 	isl_vec_free(eq);
 
 	return r < 0 ? isl_bool_error : isl_bool_true;
@@ -3579,7 +3579,7 @@ isl_bool isl_tab_need_undo(struct isl_tab *tab)
 	if (!tab)
 		return isl_bool_error;
 
-	return tab->need_undo;
+	return (isl_bool)tab->need_undo;
 }
 
 /* Remove all tracking of undo information from "tab", invalidating
@@ -3870,9 +3870,9 @@ static isl_stat perform_undo(struct isl_tab *tab, struct isl_tab_undo *undo)
 	case isl_tab_undo_unrestrict:
 		return perform_undo_var(tab, undo);
 	case isl_tab_undo_bmap_eq:
-		return isl_basic_map_free_equality(tab->bmap, 1);
+		return (isl_stat)isl_basic_map_free_equality(tab->bmap, 1);
 	case isl_tab_undo_bmap_ineq:
-		return isl_basic_map_free_inequality(tab->bmap, 1);
+		return (isl_stat)isl_basic_map_free_inequality(tab->bmap, 1);
 	case isl_tab_undo_bmap_div:
 		return drop_bmap_div(tab, undo->u.var_index);
 	case isl_tab_undo_saved_basis:

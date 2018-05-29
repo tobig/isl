@@ -289,7 +289,8 @@ struct isl_union_bound_data {
 
 static isl_stat bound_pw(__isl_take isl_pw_qpolynomial *pwqp, void *user)
 {
-	struct isl_union_bound_data *data = user;
+	struct isl_union_bound_data *data =
+		(struct isl_union_bound_data *) user;
 	isl_pw_qpolynomial_fold *pwf;
 
 	pwf = isl_pw_qpolynomial_bound(pwqp, data->type,

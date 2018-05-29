@@ -1539,7 +1539,7 @@ static void update_constraint(struct isl_ctx *ctx, struct isl_hash_table *table,
 			con + 1, 0);
 	if (!entry)
 		return;
-	c = entry->data;
+	c = (struct max_constraint*)entry->data;
 	if (c->count < n) {
 		isl_hash_table_remove(ctx, table, entry);
 		return;
@@ -1572,7 +1572,7 @@ static int has_constraint(struct isl_ctx *ctx, struct isl_hash_table *table,
 			con + 1, 0);
 	if (!entry)
 		return 0;
-	c = entry->data;
+	c = (struct max_constraint*)entry->data;
 	if (c->count < n)
 		return 0;
 	return isl_int_eq(c->c->row[0][0], con[0]);
@@ -2133,7 +2133,7 @@ static void set_max_constant_term(struct sh_data *data, __isl_keep isl_set *set,
 		if (!entry)
 			continue;
 
-		ineq_j = entry->data;
+		ineq_j = (isl_int*)entry->data;
 		neg = isl_seq_is_neg(ineq_j + 1, ineq + 1, v->len);
 		if (neg)
 			isl_int_neg(ineq_j[0], ineq_j[0]);
@@ -2650,7 +2650,7 @@ static __isl_give isl_basic_set *add_bound_from_constraint(
 		entry = isl_hash_table_find(ctx, data->p[i].table,
 						c_hash, &has_ineq, &v, 0);
 		if (entry) {
-			isl_int *ineq_i = entry->data;
+			isl_int *ineq_i = (isl_int*) entry->data;
 			int neg, more_relaxed;
 
 			neg = isl_seq_is_neg(ineq_i + 1, ineq + 1, v.len);
@@ -2787,8 +2787,8 @@ static __isl_give isl_mat *collect_inequalities(__isl_take isl_mat *mat,
 static int cmp_ineq(const void *a, const void *b, void *arg)
 {
 	unsigned dim = *(unsigned *) arg;
-	isl_int * const *ineq1 = a;
-	isl_int * const *ineq2 = b;
+	isl_int * const *ineq1 = (isl_int * const *)a;
+	isl_int * const *ineq2 = (isl_int * const *)b;
 	int cmp;
 
 	cmp = isl_seq_cmp((*ineq1) + 1, (*ineq2) + 1, dim);

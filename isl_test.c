@@ -3586,7 +3586,7 @@ int test_factorize(isl_ctx *ctx)
 
 static isl_stat check_injective(__isl_take isl_map *map, void *user)
 {
-	int *injective = user;
+	int *injective = (int*) user;
 
 	*injective = isl_map_is_injective(map);
 	isl_map_free(map);
@@ -6546,7 +6546,8 @@ struct isl_vertices_test_data {
  */
 static isl_stat find_vertex(__isl_take isl_vertex *vertex, void *user)
 {
-	struct isl_vertices_test_data *data = user;
+	struct isl_vertices_test_data *data =
+                  (struct isl_vertices_test_data *) user;
 	isl_ctx *ctx;
 	isl_multi_aff *ma;
 	isl_basic_set *bset;
@@ -7827,7 +7828,8 @@ struct isl_test_codegen_data {
 static __isl_give isl_id *before_for(__isl_keep isl_ast_build *build,
 	void *user)
 {
-	struct isl_test_codegen_data *data = user;
+	struct isl_test_codegen_data *data = 
+          (struct isl_test_codegen_data *) user;
 	isl_ctx *ctx;
 	isl_space *space;
 	isl_union_map *schedule;
@@ -7884,7 +7886,8 @@ static __isl_give isl_id *before_for(__isl_keep isl_ast_build *build,
 static __isl_give isl_ast_node *after_for(__isl_take isl_ast_node *node,
 	__isl_keep isl_ast_build *build, void *user)
 {
-	struct isl_test_codegen_data *data = user;
+	struct isl_test_codegen_data *data =
+          (struct isl_test_codegen_data *) user;
 	isl_id *id;
 	const char *name;
 	int valid;
@@ -7990,7 +7993,7 @@ static int test_ast_gen2(isl_ctx *ctx)
 static __isl_give isl_ast_node *count_domains(__isl_take isl_ast_node *node,
 	__isl_keep isl_ast_build *build, void *user)
 {
-	int *n = user;
+	int *n = (int*) user;
 
 	(*n)++;
 
@@ -8968,7 +8971,8 @@ const char *chambers_tests[] = {
  */
 static isl_stat add_cell(__isl_take isl_cell *cell, void *user)
 {
-	isl_basic_set_list **cells = user;
+	isl_basic_set_list **cells =
+          (isl_basic_set_list **)user;
 	isl_basic_set *dom;
 
 	dom = isl_cell_get_domain(cell);

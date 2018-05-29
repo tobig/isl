@@ -67,7 +67,7 @@ __isl_give isl_val *FN(UNION,eval)(__isl_take UNION *u,
 		v = isl_val_zero(isl_point_get_ctx(pnt));
 		isl_point_free(pnt);
 	} else {
-		v = FN(PART,eval)(FN(PART,copy)(entry->data), pnt);
+		v = FN(PART,eval)(FN(PART,copy)((PART*)entry->data), pnt);
 	}
 	FN(UNION,free)(u);
 	return v;

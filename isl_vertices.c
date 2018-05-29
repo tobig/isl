@@ -64,7 +64,7 @@ __isl_null isl_vertices *isl_vertices_free(__isl_take isl_vertices *vertices)
 }
 
 struct isl_vertex_list {
-	struct isl_vertex v;
+	struct isl_internal_vertex v;
 	struct isl_vertex_list *next;
 };
 
@@ -94,7 +94,7 @@ static __isl_give isl_vertices *vertices_from_list(__isl_keep isl_basic_set *bse
 		goto error;
 	vertices->ref = 1;
 	vertices->bset = isl_basic_set_copy(bset);
-	vertices->v = isl_alloc_array(bset->ctx, struct isl_vertex, n_vertices);
+	vertices->v = isl_alloc_array(bset->ctx, struct isl_internal_vertex, n_vertices);
 	if (n_vertices && !vertices->v)
 		goto error;
 	vertices->n_vertices = n_vertices;
@@ -202,7 +202,7 @@ static __isl_give isl_vertices *vertices_0D(__isl_keep isl_basic_set *bset)
 	vertices->ref = 1;
 	vertices->bset = isl_basic_set_copy(bset);
 
-	vertices->v = isl_calloc_array(bset->ctx, struct isl_vertex, 1);
+	vertices->v = isl_calloc_array(bset->ctx, struct isl_internal_vertex, 1);
 	if (!vertices->v)
 		goto error;
 	vertices->n_vertices = 1;
@@ -985,7 +985,7 @@ int isl_vertex_get_id(__isl_keep isl_vertex *vertex)
  */
 __isl_give isl_basic_set *isl_vertex_get_domain(__isl_keep isl_vertex *vertex)
 {
-	struct isl_vertex *v;
+	struct isl_internal_vertex *v;
 
 	if (!vertex)
 		return NULL;
@@ -1005,7 +1005,7 @@ __isl_give isl_basic_set *isl_vertex_get_domain(__isl_keep isl_vertex *vertex)
  */
 __isl_give isl_multi_aff *isl_vertex_get_expr(__isl_keep isl_vertex *vertex)
 {
-	struct isl_vertex *v;
+	struct isl_internal_vertex *v;
 	isl_basic_set *bset;
 
 	if (!vertex)
@@ -1538,7 +1538,7 @@ isl_stat isl_cell_foreach_simplex(__isl_take isl_cell *cell,
 
 	isl_cell_free(cell);
 
-	return r;
+	return (isl_stat)r;
 error:
 	free(simplex_ids);
 	isl_vec_free(v);

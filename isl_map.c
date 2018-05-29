@@ -955,7 +955,7 @@ isl_bool isl_basic_map_is_rational(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return ISL_F_ISSET(bmap, ISL_BASIC_MAP_RATIONAL);
+	return (isl_bool)ISL_F_ISSET(bmap, ISL_BASIC_MAP_RATIONAL);
 }
 
 /* Has "map" been marked as a rational map?
@@ -3885,7 +3885,8 @@ __isl_give isl_basic_map *isl_basic_map_insert_dims(
 	total = isl_basic_map_total_dim(bmap) + n;
 	dim_map = isl_dim_map_alloc(bmap->ctx, total);
 	off = 0;
-	for (t = isl_dim_param; t <= isl_dim_out; ++t) {
+	for (t = isl_dim_param; t <= isl_dim_out;
+             t = (enum isl_dim_type) ((int)t + 1)) {
 		if (t != type) {
 			isl_dim_map_dim(dim_map, bmap->dim, t, off);
 		} else {
@@ -4058,7 +4059,8 @@ __isl_give isl_basic_map *isl_basic_map_move_dims(
 	dim_map = isl_dim_map_alloc(bmap->ctx, total);
 
 	off = 0;
-	for (t = isl_dim_param; t <= isl_dim_out; ++t) {
+	for (t = isl_dim_param; t <= isl_dim_out;
+             t = (enum isl_dim_type)((int)t + 1)) {
 		unsigned size = isl_space_dim(bmap->dim, t);
 		if (t == dst_type) {
 			isl_dim_map_dim_range(dim_map, bmap->dim, t,
@@ -4193,7 +4195,8 @@ static __isl_give isl_basic_map *move_last(__isl_take isl_basic_map *bmap,
 	dim_map = isl_dim_map_alloc(bmap->ctx, total);
 
 	off = 0;
-	for (t = isl_dim_param; t <= isl_dim_out; ++t) {
+	for (t = isl_dim_param; t <= isl_dim_out;
+             t = (enum isl_dim_type) ((int)t + 1)) {
 		unsigned size = isl_space_dim(bmap->dim, t);
 		if (t == type) {
 			isl_dim_map_dim_range(dim_map, bmap->dim, t,
@@ -7520,7 +7523,7 @@ isl_bool isl_basic_map_div_is_marked_unknown(__isl_keep isl_basic_map *bmap,
 {
 	if (isl_basic_map_check_range(bmap, isl_dim_div, div, 1) < 0)
 		return isl_bool_error;
-	return isl_int_is_zero(bmap->div[div][0]);
+	return (isl_bool)isl_int_is_zero(bmap->div[div][0]);
 }
 
 /* Return the position of the first local variable that does not
@@ -7564,7 +7567,7 @@ isl_bool isl_basic_map_divs_known(__isl_keep isl_basic_map *bmap)
 	first = isl_basic_map_first_unknown_div(bmap);
 	if (first < 0)
 		return isl_bool_error;
-	return first == n;
+	return (isl_bool)(first == n);
 }
 
 /* Do all basic maps in "map" have an explicit representation
@@ -7580,7 +7583,7 @@ isl_bool isl_map_divs_known(__isl_keep isl_map *map)
 	for (i = 0; i < map->n; ++i) {
 		int known = isl_basic_map_divs_known(map->p[i]);
 		if (known <= 0)
-			return known;
+			return (isl_bool)known;
 	}
 
 	return isl_bool_true;
@@ -8454,7 +8457,7 @@ isl_bool isl_basic_map_is_subset(__isl_keep isl_basic_map *bmap1,
 	isl_map_free(map1);
 	isl_map_free(map2);
 
-	return is_subset;
+	return (isl_bool)is_subset;
 }
 
 isl_bool isl_basic_set_is_subset(__isl_keep isl_basic_set *bset1,
@@ -8503,12 +8506,12 @@ isl_bool isl_map_is_empty(__isl_keep isl_map *map)
 
 isl_bool isl_map_plain_is_empty(__isl_keep isl_map *map)
 {
-	return map ? map->n == 0 : isl_bool_error;
+	return (isl_bool)(map ? map->n == 0 : isl_bool_error);
 }
 
 isl_bool isl_set_plain_is_empty(__isl_keep isl_set *set)
 {
-	return set ? set->n == 0 : isl_bool_error;
+	return (isl_bool)(set ? set->n == 0 : isl_bool_error);
 }
 
 isl_bool isl_set_is_empty(__isl_keep isl_set *set)
@@ -8575,7 +8578,7 @@ isl_bool isl_basic_map_is_strict_subset(
 	is_subset = isl_basic_map_is_subset(bmap2, bmap1);
 	if (is_subset == isl_bool_error)
 		return is_subset;
-	return !is_subset;
+	return (isl_bool)!is_subset;
 }
 
 isl_bool isl_map_is_strict_subset(__isl_keep isl_map *map1,
@@ -8591,7 +8594,7 @@ isl_bool isl_map_is_strict_subset(__isl_keep isl_map *map1,
 	is_subset = isl_map_is_subset(map2, map1);
 	if (is_subset == isl_bool_error)
 		return is_subset;
-	return !is_subset;
+	return (isl_bool)!is_subset;
 }
 
 isl_bool isl_set_is_strict_subset(__isl_keep isl_set *set1,
@@ -8608,7 +8611,7 @@ isl_bool isl_basic_map_plain_is_universe(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return bmap->n_eq == 0 && bmap->n_ineq == 0;
+	return (isl_bool)(bmap->n_eq == 0 && bmap->n_ineq == 0);
 }
 
 /* Is "bset" obviously equal to the universe with the same space?
@@ -8623,7 +8626,7 @@ isl_bool isl_basic_set_plain_is_universe(__isl_keep isl_basic_set *bset)
  */
 static isl_stat involves_divs(__isl_take isl_constraint *c, void *user)
 {
-	isl_bool *univ = user;
+	isl_bool *univ = (isl_bool*)user;
 	unsigned n;
 
 	n = isl_constraint_dim(c, isl_dim_div);
@@ -8728,7 +8731,7 @@ isl_bool isl_basic_map_is_empty(__isl_keep isl_basic_map *bmap)
 	sample = isl_basic_set_sample_vec(bset);
 	if (!sample)
 		return isl_bool_error;
-	empty = sample->size == 0;
+	empty = (isl_bool)(sample->size == 0);
 	isl_vec_free(bmap->sample);
 	bmap->sample = sample;
 	if (empty)
@@ -8741,14 +8744,14 @@ isl_bool isl_basic_map_plain_is_empty(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return ISL_F_ISSET(bmap, ISL_BASIC_MAP_EMPTY);
+	return (isl_bool)ISL_F_ISSET(bmap, ISL_BASIC_MAP_EMPTY);
 }
 
 isl_bool isl_basic_set_plain_is_empty(__isl_keep isl_basic_set *bset)
 {
 	if (!bset)
 		return isl_bool_error;
-	return ISL_F_ISSET(bset, ISL_BASIC_SET_EMPTY);
+	return (isl_bool)ISL_F_ISSET(bset, ISL_BASIC_SET_EMPTY);
 }
 
 /* Is "bmap" known to be non-empty?
@@ -9660,7 +9663,7 @@ isl_bool isl_basic_map_plain_is_equal(__isl_keep isl_basic_map *bmap1,
 {
 	if (!bmap1 || !bmap2)
 		return isl_bool_error;
-	return isl_basic_map_plain_cmp(bmap1, bmap2) == 0;
+	return (isl_bool)(isl_basic_map_plain_cmp(bmap1, bmap2) == 0);
 }
 
 isl_bool isl_basic_set_plain_is_equal(__isl_keep isl_basic_set *bset1,
@@ -9793,7 +9796,7 @@ isl_bool isl_map_plain_is_equal(__isl_keep isl_map *map1,
 	map2 = isl_map_normalize(map2);
 	if (!map1 || !map2)
 		goto error;
-	equal = map1->n == map2->n;
+	equal = (isl_bool)(map1->n == map2->n);
 	for (i = 0; equal && i < map1->n; ++i) {
 		equal = isl_basic_map_plain_is_equal(map1->p[i], map2->p[i]);
 		if (equal < 0)
@@ -10677,7 +10680,7 @@ static isl_bool basic_map_dim_is_bounded(__isl_keep isl_basic_map *bmap,
 			upper = 1;
 	}
 
-	return lower && upper;
+	return (isl_bool)(lower && upper);
 }
 
 isl_bool isl_basic_map_dim_is_bounded(__isl_keep isl_basic_map *bmap,
@@ -13600,7 +13603,7 @@ isl_bool isl_basic_map_equal_div_expr_part(__isl_keep isl_basic_map *bmap1,
 		return isl_bool_error;
 	if (isl_basic_map_check_range(bmap2, isl_dim_div, pos2, 1) < 0)
 		return isl_bool_error;
-	return isl_seq_eq(bmap1->div[pos1] + first,
+	return (isl_bool)isl_seq_eq(bmap1->div[pos1] + first,
 			  bmap2->div[pos2] + first, n);
 }
 
@@ -13669,11 +13672,11 @@ static isl_bool is_internal(__isl_keep isl_vec *inner,
 	isl_seq_inner_product(inner->el, bset->ineq[ineq], inner->size,
 				&ctx->normalize_gcd);
 	if (!isl_int_is_zero(ctx->normalize_gcd))
-		return isl_int_is_nonneg(ctx->normalize_gcd);
+		return (isl_bool)(isl_int_is_nonneg(ctx->normalize_gcd));
 
 	total = isl_basic_set_dim(bset, isl_dim_all);
 	pos = isl_seq_first_non_zero(bset->ineq[ineq] + 1, total);
-	return isl_int_is_pos(bset->ineq[ineq][1 + pos]);
+	return (isl_bool)isl_int_is_pos(bset->ineq[ineq][1 + pos]);
 }
 
 /* Tighten the inequality constraints of "bset" that are outward with respect

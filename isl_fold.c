@@ -955,7 +955,7 @@ __isl_give isl_union_pw_qpolynomial_fold *isl_union_pw_qpolynomial_fold_fold_pw_
 	if (!entry->data)
 		entry->data = part;
 	else {
-		entry->data = isl_pw_qpolynomial_fold_fold(entry->data,
+		entry->data = isl_pw_qpolynomial_fold_fold((PART*)entry->data,
 					    isl_pw_qpolynomial_fold_copy(part));
 		if (!entry->data)
 			goto error;
@@ -1452,10 +1452,10 @@ static isl_stat add_pwqp(__isl_take isl_pw_qpolynomial *pwqp, void *user)
 	if (!entry->data)
 		entry->data = pwf;
 	else {
-		entry->data = isl_pw_qpolynomial_fold_add(entry->data, pwf);
+		entry->data = isl_pw_qpolynomial_fold_add((PART*)entry->data, pwf);
 		if (!entry->data)
 			return isl_stat_error;
-		if (isl_pw_qpolynomial_fold_is_zero(entry->data))
+		if (isl_pw_qpolynomial_fold_is_zero((PART*)entry->data))
 			*upwf = isl_union_pw_qpolynomial_fold_remove_part_entry(
 								*upwf, entry);
 	}
@@ -1574,7 +1574,7 @@ static isl_stat pw_qpolynomial_fold_apply(
 {
 	isl_space *map_dim;
 	isl_space *pwf_dim;
-	struct isl_apply_fold_data *data = user;
+	struct isl_apply_fold_data *data = (struct isl_apply_fold_data *)user;
 	isl_bool ok;
 
 	map_dim = isl_map_get_space(data->map);
@@ -1598,7 +1598,7 @@ static isl_stat pw_qpolynomial_fold_apply(
 
 static isl_stat map_apply(__isl_take isl_map *map, void *user)
 {
-	struct isl_apply_fold_data *data = user;
+	struct isl_apply_fold_data *data = (struct isl_apply_fold_data *)user;
 	isl_stat r;
 
 	data->map = map;

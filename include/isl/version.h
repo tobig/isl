@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-const char *isl_version(void);
+const char *isl_version();
 
 #if defined(__cplusplus)
 }

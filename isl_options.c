@@ -12,6 +12,9 @@
 #include <string.h>
 
 #include <isl/ctx.h>
+#include <isl/id.h>
+#include <isl/set.h>
+#include <isl/schedule_node.h>
 #include <isl_options_private.h>
 #include <isl/ast_build.h>
 #include <isl/schedule.h>
@@ -89,7 +92,7 @@ static struct isl_arg_choice fuse[] = {
  */
 static int set_fuse(void *opt, unsigned val)
 {
-	struct isl_options *options = opt;
+	struct isl_options *options = (struct isl_options*)opt;
 
 	options->schedule_serialize_sccs = (val == ISL_SCHEDULE_FUSE_MIN);
 
@@ -104,7 +107,7 @@ static struct isl_arg_choice separation_bounds[] = {
 
 static void print_version(void)
 {
-	printf("%s", isl_version());
+	// printf("%s", isl_version());
 }
 
 ISL_ARGS_START(struct isl_options, isl_options_args)

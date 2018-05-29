@@ -135,8 +135,8 @@ isl_bool isl_upoly_is_equal(__isl_keep struct isl_upoly *up1,
 		cst2 = isl_upoly_as_cst(up2);
 		if (!cst1 || !cst2)
 			return isl_bool_error;
-		return isl_int_eq(cst1->n, cst2->n) &&
-		       isl_int_eq(cst1->d, cst2->d);
+		return (isl_bool) (isl_int_eq(cst1->n, cst2->n) &&
+		       isl_int_eq(cst1->d, cst2->d));
 	}
 
 	rec1 = isl_upoly_as_rec(up1);
@@ -500,32 +500,32 @@ unsigned isl_qpolynomial_domain_offset(__isl_keep isl_qpolynomial *qp,
 
 isl_bool isl_qpolynomial_is_zero(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_is_zero(qp->upoly) : isl_bool_error;
+	return (isl_bool) (qp ? isl_upoly_is_zero(qp->upoly) : isl_bool_error);
 }
 
 isl_bool isl_qpolynomial_is_one(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_is_one(qp->upoly) : isl_bool_error;
+	return (isl_bool) (qp ? isl_upoly_is_one(qp->upoly) : isl_bool_error);
 }
 
 isl_bool isl_qpolynomial_is_nan(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_is_nan(qp->upoly) : isl_bool_error;
+	return (isl_bool) (qp ? isl_upoly_is_nan(qp->upoly) : isl_bool_error);
 }
 
 isl_bool isl_qpolynomial_is_infty(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_is_infty(qp->upoly) : isl_bool_error;
+	return (isl_bool) (qp ? isl_upoly_is_infty(qp->upoly) : isl_bool_error);
 }
 
 isl_bool isl_qpolynomial_is_neginfty(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_is_neginfty(qp->upoly) : isl_bool_error;
+	return (isl_bool) (qp ? isl_upoly_is_neginfty(qp->upoly) : isl_bool_error);
 }
 
 int isl_qpolynomial_sgn(__isl_keep isl_qpolynomial *qp)
 {
-	return qp ? isl_upoly_sgn(qp->upoly) : 0;
+	return (isl_bool) (qp ? isl_upoly_sgn(qp->upoly) : 0);
 }
 
 static void upoly_free_cst(__isl_take struct isl_upoly_cst *cst)
@@ -4822,7 +4822,7 @@ struct isl_to_poly_data {
 static isl_stat to_polynomial_on_orthant(__isl_take isl_set *orthant,
 	int *signs, void *user)
 {
-	struct isl_to_poly_data *data = user;
+	struct isl_to_poly_data *data = (struct isl_to_poly_data*) user;
 	isl_pw_qpolynomial *t;
 	isl_qpolynomial *qp, *up, *down;
 
@@ -4897,7 +4897,7 @@ error:
 static __isl_give isl_pw_qpolynomial *poly_entry(
 	__isl_take isl_pw_qpolynomial *pwqp, void *user)
 {
-	int *sign = user;
+	int *sign = (int*)user;
 
 	return isl_pw_qpolynomial_to_polynomial(pwqp, *sign);
 }

@@ -2063,7 +2063,7 @@ static isl_bool context_tab_insert_div(struct isl_tab *tab, int pos,
 	if (!tab->samples)
 		return isl_bool_error;
 
-	return nonneg;
+	return (isl_bool)nonneg;
 }
 
 /* Add a div specified by "div" to both the main tableau and
@@ -4512,7 +4512,8 @@ struct isl_constraint_equal_info {
 static int constraint_equal(const void *entry, const void *val)
 {
 	isl_int **row = (isl_int **)entry;
-	const struct isl_constraint_equal_info *info = val;
+	const struct isl_constraint_equal_info *info =
+          (const struct isl_constraint_equal_info *) val;
 
 	return isl_seq_eq((*row) + 1 + info->n_in, info->val, info->n_out);
 }
@@ -4581,7 +4582,7 @@ static isl_bool parallel_constraints(__isl_keep isl_basic_map *bmap,
 	isl_hash_table_free(ctx, table);
 	free(occurrences);
 
-	return i < bmap->n_ineq;
+	return (isl_bool) (i < bmap->n_ineq);
 error:
 	isl_hash_table_free(ctx, table);
 	free(occurrences);

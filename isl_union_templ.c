@@ -134,7 +134,7 @@ __isl_give PART *FN(FN(UNION,extract),PARTS)(__isl_keep UNION *u,
 		return FN(PART,ZERO)(space);
 #endif
 	isl_space_free(space);
-	return FN(PART,copy)(entry->data);
+	return FN(PART,copy)((PART*)(entry->data));
 error:
 	isl_space_free(space);
 	return NULL;
@@ -182,9 +182,10 @@ static __isl_give UNION *FN(UNION,add_part_generic)(__isl_take UNION *u,
 		entry->data = part;
 	else {
 		if (disjoint &&
-		    FN(UNION,check_disjoint_domain)(entry->data, part) < 0)
+                    FN(UNION,check_disjoint_domain)((PART*)entry->data, part) <
+                    0)
 			goto error;
-		entry->data = FN(PART,union_add_)(entry->data,
+		entry->data = FN(PART,union_add_)((PART*)entry->data,
 						FN(PART,copy)(part));
 		if (!entry->data)
 			goto error;
@@ -307,7 +308,7 @@ static isl_stat FN(UNION,transform_inplace_entry)(void **part, void *user)
 {
 	S(UNION,transform_data) *data = (S(UNION,transform_data) *) user;
 
-	*part = data->fn(*part, data->user);
+	*part = data->fn((PART*)*part, data->user);
 	if (!*part)
 		return isl_stat_error;
 	return isl_stat_ok;
@@ -381,7 +382,7 @@ __isl_null UNION *FN(UNION,free)(__isl_take UNION *u)
 
 static __isl_give PART *FN(UNION,align_entry)(__isl_take PART *part, void *user)
 {
-	isl_reordering *exp = user;
+	isl_reordering *exp = (isl_reordering*)user;
 
 	exp = isl_reordering_extend_space(isl_reordering_copy(exp),
 				    FN(PART,get_domain_space)(part));
@@ -515,7 +516,7 @@ S(UNION,match_bin_data) {
  */
 static isl_stat FN(UNION,match_bin_entry)(__isl_take PART *part, void *user)
 {
-	S(UNION,match_bin_data) *data = user;
+	S(UNION,match_bin_data) *data = (S(UNION,match_bin_data) *)user;
 	struct isl_hash_table_entry *entry2;
 	isl_space *space;
 	PART *part2;
@@ -530,14 +531,14 @@ static isl_stat FN(UNION,match_bin_entry)(__isl_take PART *part, void *user)
 		return isl_stat_ok;
 	}
 
-	part2 = entry2->data;
+	part2 = (PART*)entry2->data;
 	if (!isl_space_tuple_is_equal(part->dim, isl_dim_out,
 					part2->dim, isl_dim_out))
 		isl_die(FN(UNION,get_ctx)(data->u2), isl_error_invalid,
 			"entries should have the same range space",
 			goto error);
 
-	part = data->fn(part, FN(PART, copy)(entry2->data));
+	part = data->fn(part, FN(PART, copy)((PART*)entry2->data));
 
 	data->res = FN(FN(UNION,add),PARTS)(data->res, part);
 	if (!data->res)
@@ -619,7 +620,7 @@ S(UNION,any_set_data) {
 static __isl_give PART *FN(UNION,any_set_entry)(__isl_take PART *part,
 	void *user)
 {
-	S(UNION,any_set_data) *data = user;
+	S(UNION,any_set_data) *data = (S(UNION,any_set_data) *)user;
 
 	return data->fn(part, isl_set_copy(data->set));
 }
@@ -685,7 +686,7 @@ static int FN(UNION,set_has_dim)(const void *entry, const void *val)
  */
 static isl_stat FN(UNION,match_domain_entry)(__isl_take PART *part, void *user)
 {
-	S(UNION,match_domain_data) *data = user;
+	S(UNION,match_domain_data) *data = (S(UNION,match_domain_data) *)user;
 	uint32_t hash;
 	struct isl_hash_table_entry *entry2;
 	isl_space *space;
@@ -700,7 +701,7 @@ static isl_stat FN(UNION,match_domain_entry)(__isl_take PART *part, void *user)
 		return isl_stat_ok;
 	}
 
-	part = data->fn(part, isl_set_copy(entry2->data));
+	part = data->fn(part, isl_set_copy((isl_set*)entry2->data));
 
 	data->res = FN(FN(UNION,add),PARTS)(data->res, part);
 	if (!data->res)
@@ -761,7 +762,7 @@ __isl_give UNION *FN(UNION,intersect_domain)(__isl_take UNION *u,
 static __isl_give PART *FN(UNION,subtract_domain_entry)(__isl_take PART *part,
 	void *user)
 {
-	isl_union_set *uset = user;
+	isl_union_set *uset = (isl_union_set*)user;
 	isl_space *space;
 	isl_set *set;
 
@@ -870,7 +871,7 @@ static __isl_give UNION *FN(UNION,negate_type)(__isl_take UNION *u)
 static __isl_give PART *FN(UNION,scale_val_entry)(__isl_take PART *part,
 	void *user)
 {
-	isl_val *v = user;
+	isl_val *v = (isl_val*)user;
 
 	return FN(PART,scale_val)(part, isl_val_copy(v));
 }
@@ -921,7 +922,7 @@ error:
 static __isl_give PART *FN(UNION,scale_down_val_entry)(__isl_take PART *part,
 	void *user)
 {
-	isl_val *v = user;
+	isl_val *v = (isl_val*)user;
 
 	return FN(PART,scale_down_val)(part, isl_val_copy(v));
 }
@@ -965,9 +966,10 @@ S(UNION,plain_is_equal_data)
 
 static isl_stat FN(UNION,plain_is_equal_entry)(void **entry, void *user)
 {
-	S(UNION,plain_is_equal_data) *data = user;
+	S(UNION,plain_is_equal_data) *data =
+                (S(UNION,plain_is_equal_data) *)user;
 	struct isl_hash_table_entry *entry2;
-	PW *pw = *entry;
+	PW *pw = (PW*)*entry;
 
 	entry2 = FN(UNION,find_part_entry)(data->u2, pw->dim, 0);
 	if (!entry2 || entry2 == isl_hash_table_entry_none) {
@@ -978,7 +980,7 @@ static isl_stat FN(UNION,plain_is_equal_entry)(void **entry, void *user)
 		return isl_stat_error;
 	}
 
-	data->is_equal = FN(PW,plain_is_equal)(pw, entry2->data);
+	data->is_equal = FN(PW,plain_is_equal)(pw, (PW*)entry2->data);
 	if (data->is_equal < 0 || !data->is_equal)
 		return isl_stat_error;
 
@@ -1032,8 +1034,8 @@ error:
  */
 static isl_stat FN(UNION,involves_nan_entry)(void **entry, void *user)
 {
-	isl_bool *nan = user;
-	PW *pw = *entry;
+	isl_bool *nan = (isl_bool*)user;
+	PW *pw = (PW*)*entry;
 
 	*nan = FN(PW,involves_nan)(pw);
 	if (*nan < 0 || !nan)
@@ -1073,7 +1075,7 @@ S(UNION,drop_dims_data) {
 static __isl_give PART *FN(UNION,drop_dims_entry)(__isl_take PART *part,
 	void *user)
 {
-	S(UNION,drop_dims_data) *data = user;
+	S(UNION,drop_dims_data) *data = (S(UNION,drop_dims_data) *)user;
 
 	return FN(PART,drop_dims)(part, data->type, data->first, data->n);
 }
@@ -1116,7 +1118,7 @@ S(UNION,set_dim_name_data) {
 static __isl_give PART *FN(UNION,set_dim_name_entry)(__isl_take PART *part,
 	void *user)
 {
-	S(UNION,set_dim_name_data) *data = user;
+	S(UNION,set_dim_name_data) *data = (S(UNION,set_dim_name_data) *)user;
 
 	return FN(PART,set_dim_name)(part, isl_dim_param, data->pos, data->s);
 }

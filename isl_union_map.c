@@ -15,6 +15,7 @@
 
 #include <isl_map_private.h>
 #include <isl_union_map_private.h>
+#include <isl_union_set_private.h>
 #include <isl/ctx.h>
 #include <isl/hash.h>
 #include <isl_aff_private.h>
@@ -171,7 +172,7 @@ __isl_give isl_space *isl_union_set_get_space(__isl_keep isl_union_set *uset)
 
 static isl_stat free_umap_entry(void **entry, void *user)
 {
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*) *entry;
 	isl_map_free(map);
 	return isl_stat_ok;
 }
@@ -219,9 +220,10 @@ struct isl_union_align {
 
 static isl_stat align_entry(void **entry, void *user)
 {
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*) *entry;
 	isl_reordering *exp;
-	struct isl_union_align *data = user;
+	struct isl_union_align *data =
+                (struct isl_union_align *) user;
 
 	exp = isl_reordering_extend_space(isl_reordering_copy(data->exp),
 				    isl_map_get_space(map));
@@ -410,7 +412,7 @@ __isl_give isl_union_map *isl_union_map_add_map(__isl_take isl_union_map *umap,
 	if (!entry->data)
 		entry->data = map;
 	else {
-		entry->data = isl_map_union(entry->data, isl_map_copy(map));
+		entry->data = isl_map_union((isl_map*) entry->data, isl_map_copy(map));
 		if (!entry->data)
 			goto error;
 		isl_map_free(map);
@@ -470,7 +472,7 @@ struct isl_union_map_foreach_data
 
 static isl_stat call_on_copy(void **entry, void *user)
 {
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*)*entry;
 	struct isl_union_map_foreach_data *data;
 	data = (struct isl_union_map_foreach_data *)user;
 
@@ -518,8 +520,9 @@ struct isl_union_map_every_data {
  */
 static isl_stat call_every(void **entry, void *user)
 {
-	isl_map *map = *entry;
-	struct isl_union_map_every_data *data = user;
+	isl_map *map = (isl_map*)*entry;
+	struct isl_union_map_every_data *data =
+                (struct isl_union_map_every_data*)user;
 	isl_bool r;
 
 	r = data->test(map, data->user);
@@ -553,8 +556,8 @@ isl_bool isl_union_map_every_map(__isl_keep isl_union_map *umap,
 
 static isl_stat copy_map(void **entry, void *user)
 {
-	isl_map *map = *entry;
-	isl_map **map_p = user;
+	isl_map *map = (isl_map*)*entry;
+	isl_map **map_p = (isl_map**)user;
 
 	*map_p = isl_map_copy(map);
 
@@ -610,7 +613,7 @@ __isl_give isl_map *isl_union_map_extract_map(__isl_keep isl_union_map *umap,
 	if (!entry)
 		return isl_map_empty(space);
 	isl_space_free(space);
-	return isl_map_copy(entry->data);
+	return isl_map_copy((isl_map*)entry->data);
 error:
 	isl_space_free(space);
 	return NULL;
@@ -636,7 +639,7 @@ isl_bool isl_union_map_contains(__isl_keep isl_union_map *umap,
 	hash = isl_space_get_hash(space);
 	entry = isl_hash_table_find(umap->dim->ctx, &umap->table, hash,
 				    &has_space, space, 0);
-	return !!entry;
+	return (isl_bool)!!entry;
 }
 
 isl_bool isl_union_set_contains(__isl_keep isl_union_set *uset,
@@ -659,7 +662,8 @@ struct isl_union_set_foreach_point_data {
 
 static isl_stat foreach_point(__isl_take isl_set *set, void *user)
 {
-	struct isl_union_set_foreach_point_data *data = user;
+	struct isl_union_set_foreach_point_data *data =
+                (struct isl_union_set_foreach_point_data*)user;
 	isl_stat r;
 
 	r = isl_set_foreach_point(set, data->fn, data->user);
@@ -782,9 +786,9 @@ static __isl_keep isl_maybe_isl_map bin_try_get_match(
 				     &data->umap2->table, hash,
 				     &has_space, space, 0);
 	isl_space_free(space);
-	res.valid = entry2 != NULL;
+	res.valid = (isl_bool)(entry2 != NULL);
 	if (entry2)
-		res.value = entry2->data;
+		res.value = (isl_map*)entry2->data;
 
 	return res;
 }
@@ -800,8 +804,9 @@ static __isl_keep isl_maybe_isl_map bin_try_get_match(
  */
 static isl_stat gen_bin_entry(void **entry, void *user)
 {
-	struct isl_union_map_gen_bin_data *data = user;
-	isl_map *map = *entry;
+	struct isl_union_map_gen_bin_data *data =
+          (struct isl_union_map_gen_bin_data *)user;
+	isl_map *map = (isl_map*)*entry;
 	isl_maybe_isl_map m;
 
 	m = bin_try_get_match(data, map);
@@ -877,8 +882,9 @@ struct isl_union_map_gen_bin_set_data {
 
 static isl_stat intersect_params_entry(void **entry, void *user)
 {
-	struct isl_union_map_gen_bin_set_data *data = user;
-	isl_map *map = *entry;
+	struct isl_union_map_gen_bin_set_data *data =
+          (struct isl_union_map_gen_bin_set_data *)user;
+	isl_map *map = (isl_map*)*entry;
 	int empty;
 
 	map = isl_map_copy(map);
@@ -974,10 +980,11 @@ struct isl_union_map_match_bin_data {
 
 static isl_stat match_bin_entry(void **entry, void *user)
 {
-	struct isl_union_map_match_bin_data *data = user;
+	struct isl_union_map_match_bin_data *data =
+                (struct isl_union_map_match_bin_data *)user;
 	uint32_t hash;
 	struct isl_hash_table_entry *entry2;
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*)*entry;
 	int empty;
 
 	hash = isl_space_get_hash(map->dim);
@@ -987,7 +994,7 @@ static isl_stat match_bin_entry(void **entry, void *user)
 		return isl_stat_ok;
 
 	map = isl_map_copy(map);
-	map = data->fn(map, isl_map_copy(entry2->data));
+	map = data->fn(map, isl_map_copy((isl_map*)entry2->data));
 
 	empty = isl_map_is_empty(map);
 	if (empty < 0) {
@@ -1066,8 +1073,9 @@ error:
 
 static isl_stat gist_params_entry(void **entry, void *user)
 {
-	struct isl_union_map_gen_bin_set_data *data = user;
-	isl_map *map = *entry;
+	struct isl_union_map_gen_bin_set_data *data =
+          (struct isl_union_map_gen_bin_set_data *)user;
+	isl_map *map = (isl_map*) *entry;
 	int empty;
 
 	map = isl_map_copy(map);
@@ -1309,8 +1317,9 @@ struct isl_union_map_bin_data {
 
 static isl_stat apply_range_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data *)user;
+	isl_map *map2 = (isl_map*) *entry;
 	isl_bool empty;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_out,
@@ -1336,8 +1345,9 @@ static isl_stat apply_range_entry(void **entry, void *user)
 
 static isl_stat bin_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data *)user;
+	isl_map *map = (isl_map*)*entry;
 
 	data->map = map;
 	if (isl_hash_table_foreach(data->umap2->dim->ctx, &data->umap2->table,
@@ -1398,8 +1408,9 @@ __isl_give isl_union_set *isl_union_set_apply(
 
 static isl_stat map_lex_lt_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data *)user;
+	isl_map *map2 = (isl_map*)*entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_out,
 				 map2->dim, isl_dim_out))
@@ -1420,8 +1431,9 @@ __isl_give isl_union_map *isl_union_map_lex_lt_union_map(
 
 static isl_stat map_lex_le_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+        struct isl_union_map_bin_data *data =
+                  (struct isl_union_map_bin_data *)user;
+	isl_map *map2 = (isl_map*)*entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_out,
 				 map2->dim, isl_dim_out))
@@ -1442,8 +1454,9 @@ __isl_give isl_union_map *isl_union_map_lex_le_union_map(
 
 static isl_stat product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_map *map2 = (isl_map*) *entry;
 
 	map2 = isl_map_product(isl_map_copy(data->map), isl_map_copy(map2));
 
@@ -1460,8 +1473,9 @@ __isl_give isl_union_map *isl_union_map_product(__isl_take isl_union_map *umap1,
 
 static isl_stat set_product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_set *set2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_set *set2 = (isl_set*)*entry;
 
 	set2 = isl_set_product(isl_set_copy(data->map), isl_set_copy(set2));
 
@@ -1478,8 +1492,9 @@ __isl_give isl_union_set *isl_union_set_product(__isl_take isl_union_set *uset1,
 
 static isl_stat domain_product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_map *map2 = (isl_map*) *entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_out,
 				 map2->dim, isl_dim_out))
@@ -1503,8 +1518,9 @@ __isl_give isl_union_map *isl_union_map_domain_product(
 
 static isl_stat range_product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_map *map2 = (isl_map*) *entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_in,
 				 map2->dim, isl_dim_in))
@@ -1529,8 +1545,9 @@ __isl_give isl_union_map *isl_union_map_range_product(
  */
 static isl_stat flat_domain_product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_map *map2 = (isl_map*) *entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_out,
 				 map2->dim, isl_dim_out))
@@ -1554,8 +1571,9 @@ __isl_give isl_union_map *isl_union_map_flat_domain_product(
 
 static isl_stat flat_range_product_entry(void **entry, void *user)
 {
-	struct isl_union_map_bin_data *data = user;
-	isl_map *map2 = *entry;
+	struct isl_union_map_bin_data *data =
+                (struct isl_union_map_bin_data*) user;
+	isl_map *map2 = (isl_map*) *entry;
 
 	if (!isl_space_tuple_is_equal(data->map->dim, isl_dim_in,
 				 map2->dim, isl_dim_in))
@@ -1613,7 +1631,8 @@ struct isl_un_op_drop_user_data {
  */
 static isl_bool un_op_filter_drop_user(__isl_keep isl_map *map, void *user)
 {
-	struct isl_un_op_drop_user_data *data = user;
+	struct isl_un_op_drop_user_data *data =
+                (struct isl_un_op_drop_user_data *)user;
 	return data->filter(map);
 }
 
@@ -1636,8 +1655,9 @@ struct isl_union_map_un_data {
  */
 static isl_stat un_entry(void **entry, void *user)
 {
-	struct isl_union_map_un_data *data = user;
-	isl_map *map = *entry;
+	struct isl_union_map_un_data *data =
+                (struct isl_union_map_un_data*)user;
+	isl_map *map = (isl_map*)*entry;
 
 	if (data->control->filter) {
 		isl_bool ok;
@@ -1653,7 +1673,7 @@ static isl_stat un_entry(void **entry, void *user)
 	if (!map)
 		return isl_stat_error;
 	if (data->control->inplace) {
-		isl_map_free(*entry);
+		isl_map_free((isl_map*)*entry);
 		*entry = map;
 	} else {
 		data->res = isl_union_map_add_map(data->res, map);
@@ -2002,7 +2022,8 @@ __isl_give isl_union_map *isl_union_map_domain_map(
  */
 static isl_stat domain_map_upma(__isl_take isl_map *map, void *user)
 {
-	isl_union_pw_multi_aff **res = user;
+	isl_union_pw_multi_aff **res =
+                  (isl_union_pw_multi_aff **) user;
 	isl_multi_aff *ma;
 	isl_pw_multi_aff *pma;
 
@@ -2093,7 +2114,8 @@ __isl_give isl_union_map *isl_union_set_identity(__isl_take isl_union_set *uset)
  */
 static isl_stat identity_upma(__isl_take isl_set *set, void *user)
 {
-	isl_union_pw_multi_aff **res = user;
+	isl_union_pw_multi_aff **res =
+          (isl_union_pw_multi_aff **)user;
 	isl_space *space;
 	isl_pw_multi_aff *pma;
 
@@ -2237,10 +2259,11 @@ struct isl_union_map_is_subset_data {
 
 static isl_stat is_subset_entry(void **entry, void *user)
 {
-	struct isl_union_map_is_subset_data *data = user;
+	struct isl_union_map_is_subset_data *data =
+                (struct isl_union_map_is_subset_data *) user;
 	uint32_t hash;
 	struct isl_hash_table_entry *entry2;
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*)*entry;
 
 	hash = isl_space_get_hash(map->dim);
 	entry2 = isl_hash_table_find(data->umap2->dim->ctx, &data->umap2->table,
@@ -2251,11 +2274,11 @@ static isl_stat is_subset_entry(void **entry, void *user)
 			return isl_stat_error;
 		if (empty)
 			return isl_stat_ok;
-		data->is_subset = 0;
+		data->is_subset = isl_bool_false;
 		return isl_stat_error;
 	}
 
-	data->is_subset = isl_map_is_subset(map, entry2->data);
+	data->is_subset = isl_map_is_subset(map, (isl_map *) entry2->data);
 	if (data->is_subset < 0 || !data->is_subset)
 		return isl_stat_error;
 
@@ -2330,7 +2353,7 @@ isl_bool isl_union_map_is_strict_subset(__isl_keep isl_union_map *umap1,
 	is_subset = isl_union_map_is_subset(umap2, umap1);
 	if (is_subset == isl_bool_error)
 		return is_subset;
-	return !is_subset;
+	return (isl_bool)!is_subset;
 }
 
 isl_bool isl_union_set_is_strict_subset(__isl_keep isl_union_set *uset1,
@@ -2354,10 +2377,11 @@ struct isl_union_map_is_disjoint_data {
  */
 static isl_stat is_disjoint_entry(void **entry, void *user)
 {
-	struct isl_union_map_is_disjoint_data *data = user;
+	struct isl_union_map_is_disjoint_data *data =
+          (struct isl_union_map_is_disjoint_data *)user;
 	uint32_t hash;
 	struct isl_hash_table_entry *entry2;
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*)*entry;
 
 	hash = isl_space_get_hash(map->dim);
 	entry2 = isl_hash_table_find(data->umap2->dim->ctx, &data->umap2->table,
@@ -2365,7 +2389,7 @@ static isl_stat is_disjoint_entry(void **entry, void *user)
 	if (!entry2)
 		return isl_stat_ok;
 
-	data->is_disjoint = isl_map_is_disjoint(map, entry2->data);
+	data->is_disjoint = isl_map_is_disjoint(map, (isl_map*)entry2->data);
 	if (data->is_disjoint < 0 || !data->is_disjoint)
 		return isl_stat_error;
 
@@ -2416,7 +2440,7 @@ isl_bool isl_union_set_is_disjoint(__isl_keep isl_union_set *uset1,
 static isl_stat sample_entry(void **entry, void *user)
 {
 	isl_basic_map **sample = (isl_basic_map **)user;
-	isl_map *map = *entry;
+	isl_map *map = (isl_map*)*entry;
 
 	*sample = isl_map_sample(isl_map_copy(map));
 	if (!*sample)
@@ -2469,8 +2493,9 @@ struct isl_forall_data {
 
 static isl_stat forall_entry(void **entry, void *user)
 {
-	struct isl_forall_data *data = user;
-	isl_map *map = *entry;
+	struct isl_forall_data *data =
+          (struct isl_forall_data*) user;
+	isl_map *map = (isl_map*)*entry;
 
 	data->res = data->fn(map);
 	if (data->res < 0)
@@ -2505,8 +2530,9 @@ struct isl_forall_user_data {
 
 static isl_stat forall_user_entry(void **entry, void *user)
 {
-	struct isl_forall_user_data *data = user;
-	isl_map *map = *entry;
+	struct isl_forall_user_data *data =
+          (struct isl_forall_user_data*) user;
+	isl_map *map = (isl_map*)*entry;
 
 	data->res = data->fn(map, data->user);
 	if (data->res < 0)
@@ -2541,7 +2567,7 @@ isl_bool isl_union_map_plain_is_empty(__isl_keep isl_union_map *umap)
 {
 	if (!umap)
 		return isl_bool_error;
-	return isl_union_map_n_map(umap) == 0;
+	return (isl_bool)(isl_union_map_n_map(umap) == 0);
 }
 
 isl_bool isl_union_map_is_empty(__isl_keep isl_union_map *umap)
@@ -2620,7 +2646,8 @@ struct isl_union_map_is_sv_data {
  */
 static isl_stat single_valued_on_domain(__isl_take isl_set *set, void *user)
 {
-	struct isl_union_map_is_sv_data *data = user;
+	struct isl_union_map_is_sv_data *data =
+                (struct isl_union_map_is_sv_data *)user;
 	isl_union_map *umap, *test;
 
 	umap = isl_union_map_copy(data->umap);
@@ -2698,7 +2725,7 @@ isl_bool isl_union_map_is_injective(__isl_keep isl_union_map *umap)
  */
 static isl_stat map_plain_is_not_identity(__isl_take isl_map *map, void *user)
 {
-	isl_bool *non_identity = user;
+	isl_bool *non_identity = (isl_bool*) user;
 	isl_bool equal;
 	isl_space *space;
 
@@ -2745,7 +2772,7 @@ static isl_bool isl_union_map_plain_is_not_identity(
  */
 static isl_stat map_is_identity(__isl_take isl_map *map, void *user)
 {
-	isl_bool *identity = user;
+	isl_bool *identity = (isl_bool*) user;
 
 	*identity = isl_map_is_identity(map);
 	isl_map_free(map);
@@ -2839,7 +2866,8 @@ struct isl_fixed_dim_data {
 
 static isl_bool fixed_at_pos(__isl_keep isl_map *map, void *user)
 {
-	struct isl_fixed_dim_data *data = user;
+	struct isl_fixed_dim_data *data =
+                (struct isl_fixed_dim_data *)user;
 
 	data->v[data->n].map = map;
 	return isl_map_plain_is_fixed(map, isl_dim_out, data->pos,
@@ -2951,7 +2979,7 @@ static isl_bool plain_injective_on_range(__isl_take isl_union_map *umap,
 		dim = isl_union_map_get_space(umap);
 		injective = separates(data.v, n, dim, data.pos, n_range);
 		isl_union_map_free(umap);
-		return injective;
+		return (isl_bool)injective;
 	}
 
 	free_isl_fixed_map_array(data.v, n);
@@ -2970,7 +2998,7 @@ error:
 static isl_bool plain_injective_on_range_wrap(__isl_keep isl_set *ran,
 	void *user)
 {
-	isl_union_map *umap = user;
+	isl_union_map *umap = (isl_union_map*)user;
 
 	umap = isl_union_map_copy(umap);
 	umap = isl_union_map_intersect_range(umap,
@@ -3081,8 +3109,8 @@ __isl_give isl_union_set *isl_union_set_lift(__isl_take isl_union_set *uset)
 
 static isl_stat coefficients_entry(void **entry, void *user)
 {
-	isl_set *set = *entry;
-	isl_union_set **res = user;
+	isl_set *set = (isl_set*)*entry;
+	isl_union_set **res = (isl_union_set**)user;
 
 	set = isl_set_copy(set);
 	set = isl_set_from_basic_set(isl_set_coefficients(set));
@@ -3118,8 +3146,9 @@ error:
 
 static isl_stat solutions_entry(void **entry, void *user)
 {
-	isl_set *set = *entry;
-	isl_union_set **res = user;
+	isl_set *set = (isl_set*)*entry;
+	isl_union_set **res =
+          (isl_union_set **)user;
 
 	set = isl_set_copy(set);
 	set = isl_set_from_basic_set(isl_set_solutions(set));
@@ -3209,8 +3238,9 @@ struct isl_union_map_preimage_data {
 static isl_stat preimage_entry(void **entry, void *user)
 {
 	int m;
-	isl_map *map = *entry;
-	struct isl_union_map_preimage_data *data = user;
+	isl_map *map = (isl_map*)*entry;
+	struct isl_union_map_preimage_data *data =
+                (struct isl_union_map_preimage_data *)user;
 	isl_bool empty;
 
 	m = data->match(map, data->space);
@@ -3384,8 +3414,9 @@ struct isl_union_map_preimage_mpa_data {
 static isl_stat preimage_mpa_entry(void **entry, void *user)
 {
 	int m;
-	isl_map *map = *entry;
-	struct isl_union_map_preimage_mpa_data *data = user;
+	isl_map *map = (isl_map*)*entry;
+	struct isl_union_map_preimage_mpa_data *data =
+                (struct isl_union_map_preimage_mpa_data*) user;
 	isl_bool empty;
 
 	m = data->match(map, data->space);
@@ -3484,7 +3515,8 @@ struct isl_union_map_preimage_upma_data {
  */
 static isl_stat preimage_upma(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	struct isl_union_map_preimage_upma_data *data = user;
+	struct isl_union_map_preimage_upma_data *data =
+                (struct isl_union_map_preimage_upma_data *)user;
 	isl_union_map *umap;
 
 	umap = isl_union_map_copy(data->umap);
@@ -3628,7 +3660,8 @@ struct isl_union_map_project_out_data {
  */
 static isl_stat project_out(__isl_take isl_map *map, void *user)
 {
-	struct isl_union_map_project_out_data *data = user;
+	struct isl_union_map_project_out_data *data =
+                (struct isl_union_map_project_out_data *)user;
 
 	map = isl_map_project_out(map, data->type, data->first, data->n);
 	data->res = isl_union_map_add_map(data->res, map);
@@ -3705,14 +3738,15 @@ struct isl_union_map_involves_dims_data {
  */
 static isl_bool map_excludes(__isl_keep isl_map *map, void *user)
 {
-	struct isl_union_map_involves_dims_data *data = user;
+	struct isl_union_map_involves_dims_data *data =
+                  (struct isl_union_map_involves_dims_data *) user;
 	isl_bool involves;
 
 	involves = isl_map_involves_dims(map,
 					isl_dim_param, data->first, data->n);
 	if (involves < 0)
 		return isl_bool_error;
-	return !involves;
+	return (isl_bool)!involves;
 }
 
 /* Does "umap" involve any of the n parameters starting at first?
@@ -3738,7 +3772,7 @@ isl_bool isl_union_map_involves_dims(__isl_keep isl_union_map *umap,
 	if (excludes < 0)
 		return isl_bool_error;
 
-	return !excludes;
+	return (isl_bool)!excludes;
 }
 
 /* Internal data structure for isl_union_map_reset_range_space.
@@ -3755,7 +3789,8 @@ struct isl_union_map_reset_range_space_data {
  */
 static isl_stat reset_range_space(__isl_take isl_map *map, void *user)
 {
-	struct isl_union_map_reset_range_space_data *data = user;
+	struct isl_union_map_reset_range_space_data *data =
+              (struct isl_union_map_reset_range_space_data *)user;
 	isl_space *space;
 
 	space = isl_map_get_space(map);
@@ -3822,7 +3857,8 @@ struct isl_union_map_reset_params_data {
  */
 static isl_stat reset_params(__isl_take isl_map *map, void *user)
 {
-	struct isl_union_map_reset_params_data *data = user;
+	struct isl_union_map_reset_params_data *data =
+                (struct isl_union_map_reset_params_data *)user;
 	isl_space *space;
 
 	space = isl_map_get_space(map);
@@ -3889,7 +3925,8 @@ struct isl_union_order_at_data {
  */
 static isl_stat order_at(__isl_take isl_map *map, void *user)
 {
-	struct isl_union_order_at_data *data = user;
+	struct isl_union_order_at_data *data =
+                  (struct isl_union_order_at_data *)user;
 	isl_space *space;
 	isl_multi_pw_aff *mpa1, *mpa2;
 	isl_map *order;
@@ -4033,7 +4070,7 @@ __isl_give isl_union_set *isl_union_set_list_union(
  */
 static isl_stat add_hash(__isl_take isl_map *map, void *user)
 {
-	uint32_t *hash = user;
+	uint32_t *hash = (uint32_t*)user;
 	uint32_t map_hash;
 
 	map_hash = isl_map_get_hash(map);
@@ -4070,7 +4107,7 @@ uint32_t isl_union_set_get_hash(__isl_keep isl_union_set *uset)
  */
 static isl_stat add_n(__isl_take isl_set *set, void *user)
 {
-	int *n = user;
+	int *n = (int*)user;
 
 	*n += isl_set_n_basic_set(set);
 	isl_set_free(set);
@@ -4094,7 +4131,7 @@ int isl_union_set_n_basic_set(__isl_keep isl_union_set *uset)
  */
 static isl_stat add_list(__isl_take isl_set *set, void *user)
 {
-	isl_basic_set_list **list = user;
+	isl_basic_set_list **list = (isl_basic_set_list**)user;
 	isl_basic_set_list *list_i;
 
 	list_i = isl_set_get_basic_set_list(set);
@@ -4142,9 +4179,10 @@ struct isl_union_map_remove_map_if_data {
 /* isl_un_op_control filter that negates the result of data->fn
  * called on "map".
  */
-static isl_bool not(__isl_keep isl_map *map, void *user)
+static isl_bool not2(__isl_keep isl_map *map, void *user)
 {
-	struct isl_union_map_remove_map_if_data *data = user;
+	struct isl_union_map_remove_map_if_data *data =
+              (struct isl_union_map_remove_map_if_data *) user;
 
 	return isl_bool_not(data->fn(map, data->user));
 }
@@ -4169,7 +4207,7 @@ __isl_give isl_union_map *isl_union_map_remove_map_if(
 {
 	struct isl_union_map_remove_map_if_data data = { fn, user };
 	struct isl_un_op_control control = {
-		.filter = &not,
+		.filter = &not2,
 		.filter_user = &data,
 		.fn_map = &map_id,
 	};

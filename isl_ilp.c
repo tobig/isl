@@ -670,7 +670,7 @@ struct isl_set_opt_data {
 static isl_stat piece_opt(__isl_take isl_set *set, __isl_take isl_aff *aff,
 	void *user)
 {
-	struct isl_set_opt_data *data = user;
+	struct isl_set_opt_data *data = (struct isl_set_opt_data *)user;
 	isl_val *opt;
 
 	set = isl_set_intersect(set, isl_set_copy(data->set));
@@ -725,7 +725,8 @@ struct isl_union_set_opt_data {
  */
 static isl_stat set_opt(__isl_take isl_set *set, void *user)
 {
-	struct isl_union_set_opt_data *data = user;
+	struct isl_union_set_opt_data *data =
+                (struct isl_union_set_opt_data *)user;
 	isl_space *space;
 	isl_pw_aff *pa;
 	isl_val *opt;

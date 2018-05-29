@@ -22,7 +22,7 @@ uint32_t isl_hash_string(uint32_t hash, const char *s)
 uint32_t isl_hash_mem(uint32_t hash, const void *p, size_t len)
 {
 	int i;
-	const char *s = p;
+	const char *s = (const char*)p;
 	for (i = 0; i < len; ++i)
 		isl_hash_byte(hash, s[i]);
 	return hash;

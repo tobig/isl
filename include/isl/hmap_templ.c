@@ -52,7 +52,7 @@ __isl_give ISL_HMAP *ISL_FN(ISL_HMAP,alloc)(isl_ctx *ctx, int min_size)
 
 static isl_stat free_pair(void **entry, void *user)
 {
-	ISL_S(pair) *pair = *entry;
+	ISL_S(pair) *pair = (ISL_S(pair)*)*entry;
 	ISL_FN(ISL_KEY,free)(pair->key);
 	ISL_FN(ISL_VAL,free)(pair->val);
 	free(pair);
@@ -130,7 +130,7 @@ __isl_give ISL_HMAP *ISL_FN(ISL_HMAP,copy)(__isl_keep ISL_HMAP *hmap)
 
 static int has_key(const void *entry, const void *c_key)
 {
-	const ISL_S(pair) *pair = entry;
+	const ISL_S(pair) *pair = (const ISL_S(pair)*)entry;
 	ISL_KEY *key = (ISL_KEY *) c_key;
 
 	return ISL_KEY_IS_EQUAL(pair->key, key);
@@ -161,7 +161,7 @@ __isl_give ISL_MAYBE(ISL_VAL) ISL_FN(ISL_HMAP,try_get)(
 	if (!entry)
 		return res;
 
-	pair = entry->data;
+	pair = (ISL_S(pair)*)entry->data;
 
 	res.valid = isl_bool_true;
 	res.value = ISL_FN(ISL_VAL,copy)(pair->val);
@@ -237,7 +237,7 @@ __isl_give ISL_HMAP *ISL_FN(ISL_HMAP,drop)(__isl_take ISL_HMAP *hmap,
 		isl_die(hmap->ctx, isl_error_internal,
 			"missing entry" , goto error);
 
-	pair = entry->data;
+	pair = (ISL_S(pair)*)entry->data;
 	isl_hash_table_remove(hmap->ctx, &hmap->table, entry);
 	ISL_FN(ISL_KEY,free)(pair->key);
 	ISL_FN(ISL_VAL,free)(pair->val);
@@ -271,7 +271,7 @@ __isl_give ISL_HMAP *ISL_FN(ISL_HMAP,set)(__isl_take ISL_HMAP *hmap,
 					&has_key, key, 0);
 	if (entry) {
 		int equal;
-		pair = entry->data;
+		pair = (ISL_S(pair)*)entry->data;
 		equal = ISL_VAL_IS_EQUAL(pair->val, val);
 		if (equal < 0)
 			goto error;
@@ -293,7 +293,7 @@ __isl_give ISL_HMAP *ISL_FN(ISL_HMAP,set)(__isl_take ISL_HMAP *hmap,
 		goto error;
 
 	if (entry->data) {
-		pair = entry->data;
+		pair = (ISL_S(pair)*)entry->data;
 		ISL_FN(ISL_VAL,free)(pair->val);
 		pair->val = val;
 		ISL_FN(ISL_KEY,free)(key);
@@ -329,7 +329,7 @@ ISL_S(foreach_data) {
  */
 static isl_stat call_on_copy(void **entry, void *user)
 {
-	ISL_S(pair) *pair = *entry;
+	ISL_S(pair) *pair = (ISL_S(pair)*)*entry;
 	ISL_S(foreach_data) *data = (ISL_S(foreach_data) *) user;
 
 	return data->fn(ISL_FN(ISL_KEY,copy)(pair->key),
@@ -367,7 +367,7 @@ ISL_S(print_data) {
 static isl_stat print_pair(__isl_take ISL_KEY *key, __isl_take ISL_VAL *val,
 	void *user)
 {
-	ISL_S(print_data) *data = user;
+	ISL_S(print_data) *data = (ISL_S(print_data)*)user;
 
 	if (!data->first)
 		data->p = isl_printer_print_str(data->p, ", ");

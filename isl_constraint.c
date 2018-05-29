@@ -259,7 +259,8 @@ isl_stat isl_basic_set_foreach_constraint(__isl_keep isl_basic_set *bset,
 static isl_stat collect_constraint(__isl_take isl_constraint *constraint,
 	void *user)
 {
-	isl_constraint_list **list = user;
+	isl_constraint_list **list =
+                (isl_constraint_list **)user;
 
 	if (isl_constraint_is_div_constraint(constraint))
 		isl_constraint_free(constraint);
@@ -445,7 +446,7 @@ isl_bool isl_constraint_is_lower_bound(__isl_keep isl_constraint *constraint,
 			"position out of bounds", return isl_bool_error);
 
 	pos += isl_local_space_offset(constraint->ls, type);
-	return isl_int_is_pos(constraint->v->el[pos]);
+	return (isl_bool)isl_int_is_pos(constraint->v->el[pos]);
 }
 
 /* Does the given constraint represent an upper bound on the given
@@ -462,7 +463,7 @@ isl_bool isl_constraint_is_upper_bound(__isl_keep isl_constraint *constraint,
 			"position out of bounds", return isl_bool_error);
 
 	pos += isl_local_space_offset(constraint->ls, type);
-	return isl_int_is_neg(constraint->v->el[pos]);
+	return (isl_bool)isl_int_is_neg(constraint->v->el[pos]);
 }
 
 const char *isl_constraint_get_dim_name(__isl_keep isl_constraint *constraint,
@@ -693,7 +694,7 @@ isl_bool isl_constraint_is_equality(struct isl_constraint *constraint)
 {
 	if (!constraint)
 		return isl_bool_error;
-	return constraint->eq;
+	return (isl_bool)constraint->eq;
 }
 
 int isl_constraint_is_div_constraint(__isl_keep isl_constraint *constraint)

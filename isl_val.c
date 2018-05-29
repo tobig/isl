@@ -962,7 +962,7 @@ isl_bool isl_val_is_divisible_by(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 		isl_die(isl_val_get_ctx(v1), isl_error_invalid,
 			"expecting two integers", return isl_bool_error);
 
-	return isl_int_is_divisible_by(v1->n, v2->n);
+	return (isl_bool)isl_int_is_divisible_by(v1->n, v2->n);
 }
 
 /* Given two integer values "v1" and "v2", return the residue of "v1"
@@ -1135,7 +1135,7 @@ isl_bool isl_val_is_int(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_one(v->d);
+	return (isl_bool)isl_int_is_one(v->d);
 }
 
 /* Does "v" represent a rational value?
@@ -1145,7 +1145,7 @@ isl_bool isl_val_is_rat(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return !isl_int_is_zero(v->d);
+	return (isl_bool)!isl_int_is_zero(v->d);
 }
 
 /* Does "v" represent NaN?
@@ -1155,7 +1155,7 @@ isl_bool isl_val_is_nan(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_zero(v->n) && isl_int_is_zero(v->d);
+	return (isl_bool)(isl_int_is_zero(v->n) && isl_int_is_zero(v->d));
 }
 
 /* Does "v" represent +infinity?
@@ -1165,7 +1165,7 @@ isl_bool isl_val_is_infty(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_pos(v->n) && isl_int_is_zero(v->d);
+	return (isl_bool)(isl_int_is_pos(v->n) && isl_int_is_zero(v->d));
 }
 
 /* Does "v" represent -infinity?
@@ -1175,7 +1175,7 @@ isl_bool isl_val_is_neginfty(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_neg(v->n) && isl_int_is_zero(v->d);
+	return (isl_bool)(isl_int_is_neg(v->n) && isl_int_is_zero(v->d));
 }
 
 /* Does "v" represent the integer zero?
@@ -1185,7 +1185,7 @@ isl_bool isl_val_is_zero(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_zero(v->n) && !isl_int_is_zero(v->d);
+	return (isl_bool)(isl_int_is_zero(v->n) && !isl_int_is_zero(v->d));
 }
 
 /* Does "v" represent the integer one?
@@ -1198,7 +1198,7 @@ isl_bool isl_val_is_one(__isl_keep isl_val *v)
 	if (isl_val_is_nan(v))
 		return isl_bool_false;
 
-	return isl_int_eq(v->n, v->d);
+	return (isl_bool)isl_int_eq(v->n, v->d);
 }
 
 /* Does "v" represent the integer negative one?
@@ -1208,7 +1208,7 @@ isl_bool isl_val_is_negone(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_neg(v->n) && isl_int_abs_eq(v->n, v->d);
+	return (isl_bool)(isl_int_is_neg(v->n) && isl_int_abs_eq(v->n, v->d));
 }
 
 /* Is "v" (strictly) positive?
@@ -1218,7 +1218,7 @@ isl_bool isl_val_is_pos(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_pos(v->n);
+	return (isl_bool)(isl_int_is_pos(v->n));
 }
 
 /* Is "v" (strictly) negative?
@@ -1228,7 +1228,7 @@ isl_bool isl_val_is_neg(__isl_keep isl_val *v)
 	if (!v)
 		return isl_bool_error;
 
-	return isl_int_is_neg(v->n);
+	return (isl_bool)isl_int_is_neg(v->n);
 }
 
 /* Is "v" non-negative?
@@ -1241,7 +1241,7 @@ isl_bool isl_val_is_nonneg(__isl_keep isl_val *v)
 	if (isl_val_is_nan(v))
 		return isl_bool_false;
 
-	return isl_int_is_nonneg(v->n);
+	return (isl_bool)isl_int_is_nonneg(v->n);
 }
 
 /* Is "v" non-positive?
@@ -1254,7 +1254,7 @@ isl_bool isl_val_is_nonpos(__isl_keep isl_val *v)
 	if (isl_val_is_nan(v))
 		return isl_bool_false;
 
-	return isl_int_is_nonpos(v->n);
+	return (isl_bool)isl_int_is_nonpos(v->n);
 }
 
 /* Return the sign of "v".
@@ -1282,7 +1282,7 @@ isl_bool isl_val_lt(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	if (!v1 || !v2)
 		return isl_bool_error;
 	if (isl_val_is_int(v1) && isl_val_is_int(v2))
-		return isl_int_lt(v1->n, v2->n);
+		return (isl_bool)isl_int_lt(v1->n, v2->n);
 	if (isl_val_is_nan(v1) || isl_val_is_nan(v2))
 		return isl_bool_false;
 	if (isl_val_eq(v1, v2))
@@ -1299,7 +1299,7 @@ isl_bool isl_val_lt(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	isl_int_init(t);
 	isl_int_mul(t, v1->n, v2->d);
 	isl_int_submul(t, v2->n, v1->d);
-	lt = isl_int_is_neg(t);
+	lt = (isl_bool)isl_int_is_neg(t);
 	isl_int_clear(t);
 
 	return lt;
@@ -1322,7 +1322,7 @@ isl_bool isl_val_gt_si(__isl_keep isl_val *v, long i)
 	if (!v)
 		return isl_bool_error;
 	if (isl_val_is_int(v))
-		return isl_int_cmp_si(v->n, i) > 0;
+		return (isl_bool)(isl_int_cmp_si(v->n, i) > 0);
 	if (isl_val_is_nan(v))
 		return isl_bool_false;
 	if (isl_val_is_infty(v))
@@ -1347,7 +1347,7 @@ isl_bool isl_val_le(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	if (!v1 || !v2)
 		return isl_bool_error;
 	if (isl_val_is_int(v1) && isl_val_is_int(v2))
-		return isl_int_le(v1->n, v2->n);
+		return (isl_bool)isl_int_le(v1->n, v2->n);
 	if (isl_val_is_nan(v1) || isl_val_is_nan(v2))
 		return isl_bool_false;
 	if (isl_val_eq(v1, v2))
@@ -1364,7 +1364,7 @@ isl_bool isl_val_le(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	isl_int_init(t);
 	isl_int_mul(t, v1->n, v2->d);
 	isl_int_submul(t, v2->n, v1->d);
-	le = isl_int_is_nonpos(t);
+	le = (isl_bool)isl_int_is_nonpos(t);
 	isl_int_clear(t);
 
 	return le;
@@ -1417,7 +1417,7 @@ isl_bool isl_val_eq(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	if (isl_val_is_nan(v1) || isl_val_is_nan(v2))
 		return isl_bool_false;
 
-	return isl_int_eq(v1->n, v2->n) && isl_int_eq(v1->d, v2->d);
+	return (isl_bool)(isl_int_eq(v1->n, v2->n) && isl_int_eq(v1->d, v2->d));
 }
 
 /* Is "v1" equal to "v2" in absolute value?
@@ -1429,7 +1429,7 @@ isl_bool isl_val_abs_eq(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	if (isl_val_is_nan(v1) || isl_val_is_nan(v2))
 		return isl_bool_false;
 
-	return isl_int_abs_eq(v1->n, v2->n) && isl_int_eq(v1->d, v2->d);
+	return (isl_bool)(isl_int_abs_eq(v1->n, v2->n) && isl_int_eq(v1->d, v2->d));
 }
 
 /* Is "v1" different from "v2"?
@@ -1441,7 +1441,7 @@ isl_bool isl_val_ne(__isl_keep isl_val *v1, __isl_keep isl_val *v2)
 	if (isl_val_is_nan(v1) || isl_val_is_nan(v2))
 		return isl_bool_false;
 
-	return isl_int_ne(v1->n, v2->n) || isl_int_ne(v1->d, v2->d);
+	return (isl_bool)(isl_int_ne(v1->n, v2->n) || isl_int_ne(v1->d, v2->d));
 }
 
 /* Print a textual representation of "v" onto "p".

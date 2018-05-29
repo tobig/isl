@@ -136,7 +136,7 @@ isl_bool isl_point_is_void(__isl_keep isl_point *pnt)
 	if (!pnt)
 		return isl_bool_error;
 
-	return pnt->vec->size == 0;
+	return (isl_bool) (pnt->vec->size == 0);
 }
 
 /* Return the space of "pnt".
@@ -649,7 +649,7 @@ __isl_give isl_set *isl_set_box_from_points(__isl_take isl_point *pnt1,
 static __isl_give isl_printer *print_coordinate(__isl_take isl_printer *p,
 	struct isl_print_space_data *data, unsigned pos)
 {
-	isl_point *pnt = data->user;
+	isl_point *pnt = (isl_point*) data->user;
 
 	p = isl_printer_print_isl_int(p, pnt->vec->el[1 + pos]);
 	if (!isl_int_is_one(pnt->vec->el[0])) {

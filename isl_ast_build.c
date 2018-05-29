@@ -718,7 +718,7 @@ error:
 static isl_stat extract_single_piece(__isl_take isl_set *set,
 	__isl_take isl_aff *aff, void *user)
 {
-	isl_aff **p = user;
+	isl_aff **p = (isl_aff**)user;
 
 	*p = aff;
 	isl_set_free(set);
@@ -1441,7 +1441,8 @@ struct isl_ast_build_involves_data {
  */
 static isl_stat involves_depth(__isl_take isl_map *map, void *user)
 {
-	struct isl_ast_build_involves_data *data = user;
+	struct isl_ast_build_involves_data *data =
+                (struct isl_ast_build_involves_data *)user;
 
 	data->involves = isl_map_involves_dims(map, isl_dim_in, data->depth, 1);
 	isl_map_free(map);
@@ -1549,7 +1550,8 @@ static __isl_give isl_union_map *options_insert_dim(
 	insertion = isl_union_map_empty(isl_union_map_get_space(options));
 
 	for (type = isl_ast_loop_atomic;
-	    type <= isl_ast_loop_separate; ++type) {
+	    type <= isl_ast_loop_separate;
+            type = (enum isl_ast_loop_type)(((int)type) + 1)) {
 		isl_map *map_type = isl_map_copy(map);
 		const char *name = option_str[type];
 		map_type = isl_map_set_tuple_name(map_type, isl_dim_in, name);

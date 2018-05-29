@@ -308,7 +308,8 @@ static __isl_give isl_ast_node *ast_node_insert_if(
  */
 static isl_stat insert_if(__isl_take isl_basic_set *bset, void *user)
 {
-	struct isl_insert_if_data *data = user;
+	struct isl_insert_if_data *data =
+                (struct isl_insert_if_data *)user;
 	isl_ast_node *node;
 	isl_set *set;
 

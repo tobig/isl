@@ -92,7 +92,7 @@ static __isl_give isl_ast_graft *at_each_domain(__isl_take isl_ast_graft *graft,
 	__isl_keep isl_map *executed, __isl_keep isl_ast_build *build)
 {
 	if (!graft || !build)
-		return isl_ast_graft_free(graft);
+		return (isl_ast_graft*)isl_ast_graft_free(graft);
 	if (!build->at_each_domain)
 		return graft;
 
@@ -197,7 +197,8 @@ static isl_stat add_domain(__isl_take isl_map *executed,
  */
 static isl_stat generate_domain(__isl_take isl_map *executed, void *user)
 {
-	struct isl_generate_domain_data *data = user;
+	struct isl_generate_domain_data *data =
+                (struct isl_generate_domain_data *)user;
 	isl_set *domain;
 	isl_map *map = NULL;
 	int empty, sv;
@@ -392,7 +393,7 @@ static int constraint_type(isl_constraint *c, int pos)
 static int cmp_constraint(__isl_keep isl_constraint *a,
 	__isl_keep isl_constraint *b, void *user)
 {
-	int *depth = user;
+	int *depth = (int*)user;
 	int t1 = constraint_type(a, *depth);
 	int t2 = constraint_type(b, *depth);
 
@@ -903,7 +904,7 @@ static __isl_give isl_ast_graft *set_enforced_from_list(
 static isl_stat aff_constant_is_negative(__isl_take isl_set *set,
 	__isl_take isl_aff *aff, void *user)
 {
-	int *neg = user;
+	int *neg = (int*)user;
 	isl_val *v;
 
 	v = isl_aff_get_constant_val(aff);
@@ -921,7 +922,7 @@ static isl_stat pw_aff_constant_is_negative(__isl_take isl_pw_aff *pa,
 	void *user)
 {
 	isl_stat r;
-	int *neg = user;
+	int *neg = (int*)user;
 
 	r = isl_pw_aff_foreach_piece(pa, &aff_constant_is_negative, user);
 	isl_pw_aff_free(pa);
@@ -1229,7 +1230,8 @@ struct isl_ast_count_constraints_data {
  */
 static isl_stat count_constraints(__isl_take isl_constraint *c, void *user)
 {
-	struct isl_ast_count_constraints_data *data = user;
+	struct isl_ast_count_constraints_data *data =
+                (struct isl_ast_count_constraints_data *)user;
 
 	if (isl_constraint_is_lower_bound(c, isl_dim_set, data->pos))
 		data->n_lower++;
@@ -1558,7 +1560,8 @@ struct isl_check_scaled_data {
 static isl_stat constraint_check_scaled(__isl_take isl_constraint *c,
 	void *user)
 {
-	struct isl_check_scaled_data *data = user;
+	struct isl_check_scaled_data *data =
+                (struct isl_check_scaled_data *)user;
 	int i, j, n;
 	enum isl_dim_type t[] = { isl_dim_param, isl_dim_in, isl_dim_out,
 				    isl_dim_div };
@@ -1738,7 +1741,8 @@ static __isl_give isl_ast_graft *create_node(__isl_take isl_union_map *executed,
  */
 static isl_stat collect_basic_set(__isl_take isl_basic_set *bset, void *user)
 {
-	isl_basic_set_list **list = user;
+	isl_basic_set_list **list =
+                (isl_basic_set_list **)user;
 
 	*list = isl_basic_set_list_add(*list, bset);
 
@@ -1849,7 +1853,7 @@ static isl_bool domain_follows_at_depth(__isl_keep isl_basic_set *i,
 	empty = isl_basic_map_is_empty(test);
 	isl_basic_map_free(test);
 
-	return empty < 0 ? isl_bool_error : !empty;
+	return (isl_bool)(empty < 0 ? isl_bool_error : !empty);
 }
 
 /* Split up each element of "list" into a part that is related to "bset"
@@ -1955,7 +1959,8 @@ struct isl_add_nodes_data {
  */
 static isl_stat add_nodes(__isl_take isl_basic_set_list *scc, void *user)
 {
-	struct isl_add_nodes_data *data = user;
+	struct isl_add_nodes_data *data =
+                (struct isl_add_nodes_data*)user;
 	int i, n, depth;
 	isl_basic_set *bset, *first;
 	isl_basic_set_list *list;
@@ -2073,7 +2078,7 @@ static isl_bool shared_outer(__isl_keep isl_basic_set *i,
 	empty = isl_basic_map_is_empty(test);
 	isl_basic_map_free(test);
 
-	return empty < 0 ? isl_bool_error : !empty;
+	return (isl_bool)(empty < 0 ? isl_bool_error : !empty);
 }
 
 /* Internal data structure for generate_sorted_domains_wrap.
@@ -2107,7 +2112,8 @@ struct isl_ast_generate_parallel_domains_data {
 static isl_stat generate_sorted_domains_wrap(__isl_take isl_basic_set_list *scc,
 	void *user)
 {
-	struct isl_ast_generate_parallel_domains_data *data = user;
+	struct isl_ast_generate_parallel_domains_data *data =
+                (struct isl_ast_generate_parallel_domains_data *)user;
 	isl_ast_graft_list *list;
 
 	list = generate_sorted_domains(scc, data->executed, data->build);
@@ -2180,7 +2186,7 @@ static __isl_give isl_ast_graft_list *generate_parallel_domains(
  */
 struct isl_separate_domain_data {
 	isl_ast_build *build;
-	int explicit;
+	int explicit2;
 	isl_set *domain;
 };
 
@@ -2237,11 +2243,12 @@ static __isl_give isl_set *explicit_bounds(__isl_take isl_map *map,
  */
 static isl_stat separate_domain(__isl_take isl_map *map, void *user)
 {
-	struct isl_separate_domain_data *data = user;
+	struct isl_separate_domain_data *data =
+                (struct isl_separate_domain_data *)user;
 	isl_set *domain;
 	isl_set *d1, *d2;
 
-	if (data->explicit)
+	if (data->explicit2)
 		domain = explicit_bounds(map, data->build);
 	else
 		domain = implicit_bounds(map, data->build);
@@ -2273,7 +2280,7 @@ static __isl_give isl_set *separate_schedule_domains(
 	isl_ctx *ctx;
 
 	ctx = isl_ast_build_get_ctx(build);
-	data.explicit = isl_options_get_ast_build_separation_bounds(ctx) ==
+	data.explicit2 = isl_options_get_ast_build_separation_bounds(ctx) ==
 				    ISL_AST_BUILD_SEPARATION_BOUNDS_EXPLICIT;
 	data.domain = isl_set_empty(space);
 	if (isl_union_map_foreach_map(executed, &separate_domain, &data) < 0)
@@ -2330,7 +2337,7 @@ static isl_stat update_n_div(__isl_take isl_set *set,
 	__isl_take isl_multi_aff *ma, void *user)
 {
 	isl_aff *aff;
-	int *n = user;
+	int *n = (int*)user;
 	int n_div;
 
 	aff = isl_multi_aff_get_aff(ma, 0);
@@ -2695,7 +2702,8 @@ struct isl_ast_unroll_data {
  */
 static int do_unroll_iteration(__isl_take isl_basic_set *bset, void *user)
 {
-	struct isl_ast_unroll_data *data = user;
+	struct isl_ast_unroll_data *data =
+                (struct isl_ast_unroll_data *)user;
 	isl_set *set;
 	isl_basic_set_list *list;
 
@@ -2983,7 +2991,8 @@ error:
  */
 static isl_stat compute_class_domains(__isl_take isl_point *pnt, void *user)
 {
-	struct isl_codegen_domains *domains = user;
+	struct isl_codegen_domains *domains =
+                (struct isl_codegen_domains *)user;
 	isl_set *class_set;
 	isl_set *domain;
 	int disjoint;
@@ -3018,9 +3027,11 @@ static void compute_domains_init_options(isl_set *option[4],
 	isl_set *unroll;
 
 	for (type = isl_ast_loop_atomic;
-	    type <= isl_ast_loop_separate; ++type) {
+	    type <= isl_ast_loop_separate;
+            type = (enum isl_ast_loop_type)(((int)type) + 1)) {
 		option[type] = isl_ast_build_get_option_domain(build, type);
-		for (type2 = isl_ast_loop_atomic; type2 < type; ++type2)
+		for (type2 = isl_ast_loop_atomic; type2 < type;
+              type2 = (enum isl_ast_loop_type)(((int)type2) + 1))
 			option[type] = isl_set_subtract(option[type],
 						isl_set_copy(option[type2]));
 	}
@@ -3107,7 +3118,8 @@ static __isl_give isl_basic_set_list *compute_domains(
 	isl_set_free(domains.schedule_domain);
 	isl_set_free(domains.done);
 	isl_map_free(domains.sep_class);
-	for (type = isl_ast_loop_atomic; type <= isl_ast_loop_separate; ++type)
+	for (type = isl_ast_loop_atomic; type <= isl_ast_loop_separate;
+            type = (enum isl_ast_loop_type)(((int)type) + 1))
 		isl_set_free(domains.option[type]);
 
 	return domains.list;
@@ -3180,7 +3192,8 @@ struct isl_ast_unroll_tree_data {
  */
 static int init_unroll_tree(int n, void *user)
 {
-	struct isl_ast_unroll_tree_data *data = user;
+	struct isl_ast_unroll_tree_data *data =
+                (struct isl_ast_unroll_tree_data *)user;
 	isl_ctx *ctx;
 
 	ctx = isl_ast_build_get_ctx(data->build);
@@ -3194,7 +3207,8 @@ static int init_unroll_tree(int n, void *user)
  */
 static int do_unroll_tree_iteration(__isl_take isl_basic_set *bset, void *user)
 {
-	struct isl_ast_unroll_tree_data *data = user;
+	struct isl_ast_unroll_tree_data *data =
+                (struct isl_ast_unroll_tree_data *)user;
 
 	data->list = add_node(data->list, isl_union_map_copy(data->executed),
 				bset, isl_ast_build_copy(data->build));
@@ -4202,7 +4216,8 @@ error:
  */
 static isl_stat extract_domain(__isl_take isl_map *map, void *user)
 {
-	struct isl_set_map_pair **next = user;
+	struct isl_set_map_pair **next =
+                (struct isl_set_map_pair **)user;
 
 	(*next)->map = isl_map_copy(map);
 	(*next)->set = isl_map_domain(map);
@@ -4619,7 +4634,8 @@ struct isl_any_scheduled_after_data {
  */
 static isl_bool any_scheduled_after(int i, int j, void *user)
 {
-	struct isl_any_scheduled_after_data *data = user;
+	struct isl_any_scheduled_after_data *data =
+                (struct isl_any_scheduled_after_data *)user;
 	int dim = isl_set_dim(data->domain[i].set, isl_dim_set);
 	int pos;
 
@@ -4643,10 +4659,10 @@ static isl_bool any_scheduled_after(int i, int j, void *user)
 		after = after_in_subtree(data->build, data->domain[i].map,
 					    data->domain[j].map);
 		if (after < 0 || after)
-			return after;
+			return (isl_bool)after;
 	}
 
-	return data->group_coscheduled;
+	return (isl_bool)data->group_coscheduled;
 }
 
 /* Look for independent components at the current depth and generate code
@@ -4917,7 +4933,8 @@ static isl_stat generate_code_in_space(struct isl_generate_code_data *data,
  */
 static isl_stat generate_code_set(__isl_take isl_set *set, void *user)
 {
-	struct isl_generate_code_data *data = user;
+	struct isl_generate_code_data *data =
+                (struct isl_generate_code_data *)user;
 	isl_space *space, *build_space;
 	int is_domain;
 

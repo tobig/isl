@@ -141,7 +141,7 @@ static __isl_give isl_ast_node *construct_ast_from_union_map(
 static __isl_give isl_schedule_node *node_set_options(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	enum isl_ast_loop_type *type = user;
+	enum isl_ast_loop_type *type = (enum isl_ast_loop_type *)user;
 	int i, n;
 
 	if (isl_schedule_node_get_type(node) != isl_schedule_node_band)
@@ -220,12 +220,12 @@ int main(int argc, char **argv)
 	} else if (obj.type == isl_obj_map) {
 		isl_union_map *umap;
 
-		umap = isl_union_map_from_map(obj.v);
+		umap = isl_union_map_from_map((isl_map*)obj.v);
 		tree = construct_ast_from_union_map(umap, s);
 	} else if (obj.type == isl_obj_union_map) {
-		tree = construct_ast_from_union_map(obj.v, s);
+		tree = construct_ast_from_union_map((isl_union_map*)obj.v, s);
 	} else if (obj.type == isl_obj_schedule) {
-		tree = construct_ast_from_schedule(obj.v);
+		tree = construct_ast_from_schedule((isl_schedule*)obj.v);
 	} else {
 		obj.type->free(obj.v);
 		isl_die(ctx, isl_error_invalid, "unknown input",

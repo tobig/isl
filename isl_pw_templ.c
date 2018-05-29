@@ -266,7 +266,7 @@ isl_bool FN(PW,IS_ZERO)(__isl_keep PW *pw)
 	if (!pw)
 		return isl_bool_error;
 
-	return pw->n == 0;
+	return (isl_bool)(pw->n == 0);
 }
 
 #ifndef NO_REALIGN
@@ -1064,8 +1064,8 @@ __isl_give PW *FN(PW,gist_params)(__isl_take PW *pw,
  */
 static int FN(PW,sort_field_cmp)(const void *p1, const void *p2, void *arg)
 {
-	struct FN(PW,piece) const *pc1 = p1;
-	struct FN(PW,piece) const *pc2 = p2;
+	struct FN(PW,piece) const *pc1 = (struct FN(PW,piece) const *)p1;
+	struct FN(PW,piece) const *pc2 = (struct FN(PW,piece) const *)p2;
 
 	return FN(EL,plain_cmp)(pc1->FIELD, pc2->FIELD);
 }
@@ -1156,8 +1156,9 @@ isl_bool FN(PW,involves_dims)(__isl_keep PW *pw, enum isl_dim_type type,
 	set_type = type == isl_dim_in ? isl_dim_set : type;
 
 	for (i = 0; i < pw->n; ++i) {
-		isl_bool involves = FN(EL,involves_dims)(pw->p[i].FIELD,
-							type, first, n);
+                isl_bool involves =
+                  (isl_bool)(FN(EL,involves_dims)(pw->p[i].FIELD, type, first,
+                                                  n));
 		if (involves < 0 || involves)
 			return involves;
 		involves = isl_set_involves_dims(pw->p[i].set,
@@ -2031,14 +2032,14 @@ isl_bool FN(PW,plain_is_equal)(__isl_keep PW *pw1, __isl_keep PW *pw2)
 	if (!pw1 || !pw2)
 		goto error;
 
-	equal = pw1->n == pw2->n;
+	equal = (isl_bool)(pw1->n == pw2->n);
 	for (i = 0; equal && i < pw1->n; ++i) {
 		equal = isl_set_plain_is_equal(pw1->p[i].set, pw2->p[i].set);
 		if (equal < 0)
 			goto error;
 		if (!equal)
 			break;
-		equal = FN(EL,plain_is_equal)(pw1->p[i].FIELD, pw2->p[i].FIELD);
+		equal = (isl_bool)FN(EL,plain_is_equal)(pw1->p[i].FIELD, pw2->p[i].FIELD);
 		if (equal < 0)
 			goto error;
 	}

@@ -338,7 +338,8 @@ struct access_sort_info {
  */
 static int access_sort_cmp(const void *p1, const void *p2, void *user)
 {
-	struct access_sort_info *sort_info = user;
+	struct access_sort_info *sort_info =
+                (struct access_sort_info*)user;
 	isl_access_info *acc = sort_info->access_info;
 
 	if (sort_info->error)
@@ -1486,7 +1487,8 @@ __isl_null isl_union_access_info *isl_union_access_info_free(
 	if (!access)
 		return NULL;
 
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = isl_access_sink; i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		isl_union_map_free(access->access[i]);
 	isl_schedule_free(access->schedule);
 	isl_union_map_free(access->schedule_map);
@@ -1536,7 +1538,8 @@ static __isl_give isl_union_access_info *isl_union_access_info_init(
 
 	space = isl_union_map_get_space(info->access[isl_access_sink]);
 	empty = isl_union_map_empty(isl_space_copy(space));
-	for (i = isl_access_sink + 1; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink + 1); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		if (!info->access[i])
 			info->access[i] = isl_union_map_copy(empty);
 	isl_union_map_free(empty);
@@ -1544,7 +1547,8 @@ static __isl_give isl_union_access_info *isl_union_access_info_init(
 		info->schedule = isl_schedule_empty(isl_space_copy(space));
 	isl_space_free(space);
 
-	for (i = isl_access_sink + 1; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)(((int)isl_access_sink) + 1); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		if (!info->access[i])
 			return isl_union_access_info_free(info);
 	if (!info->schedule && !info->schedule_map)
@@ -1721,7 +1725,8 @@ __isl_give isl_union_access_info *isl_union_access_info_copy(
 		return NULL;
 	copy = isl_union_access_info_from_sink(
 		    isl_union_map_copy(access->access[isl_access_sink]));
-	for (i = isl_access_sink + 1; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink + 1); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		copy = isl_union_access_info_set(copy, i,
 					isl_union_map_copy(access->access[i]));
 	if (access->schedule)
@@ -1811,7 +1816,8 @@ __isl_give isl_printer *isl_printer_print_union_access_info(
 		return isl_printer_free(p);
 
 	p = isl_printer_yaml_start_mapping(p);
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = isl_access_sink; i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		p = print_access_field(p, access, i);
 	if (access->schedule) {
 		p = isl_printer_print_str(p, key_str[isl_ai_key_schedule]);
@@ -1901,7 +1907,8 @@ __isl_give isl_union_access_info *isl_stream_read_union_access_info(
 		case isl_ai_key_may_source:
 		case isl_ai_key_kill:
 			access = read_union_map(s);
-			info = isl_union_access_info_set(info, key, access);
+			info = isl_union_access_info_set(info,
+                                (enum isl_access_type)(key), access);
 			if (!info)
 				return NULL;
 			break;
@@ -1975,13 +1982,15 @@ static __isl_give isl_union_access_info *isl_union_access_info_align_params(
 		return NULL;
 
 	space = isl_union_map_get_space(access->access[isl_access_sink]);
-	for (i = isl_access_sink + 1; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink + 1); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		space = isl_space_align_params(space,
 				isl_union_map_get_space(access->access[i]));
 	if (access->schedule_map)
 		space = isl_space_align_params(space,
 				isl_union_map_get_space(access->schedule_map));
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		access->access[i] =
 			isl_union_map_align_params(access->access[i],
 							isl_space_copy(space));
@@ -1994,7 +2003,8 @@ static __isl_give isl_union_access_info *isl_union_access_info_align_params(
 			return isl_union_access_info_free(access);
 	}
 
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		if (!access->access[i])
 			return isl_union_access_info_free(access);
 
@@ -2035,13 +2045,15 @@ isl_union_access_info_introduce_schedule(
 
 	sm = isl_union_map_reverse(access->schedule_map);
 	sm = isl_union_map_range_map(sm);
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		access->access[i] =
 			isl_union_map_apply_range(isl_union_map_copy(sm),
 						access->access[i]);
 	access->schedule_map = sm;
 
-	for (i = isl_access_sink; i < isl_access_end; ++i)
+	for (i = (enum isl_access_type)((int)isl_access_sink); i < isl_access_end;
+             i = (enum isl_access_type) (((int)i) + 1))
 		if (!access->access[i])
 			return isl_union_access_info_free(access);
 	if (!access->schedule_map)
@@ -2393,8 +2405,8 @@ error:
  */
 static int before(void *first, void *second)
 {
-	struct isl_sched_info *info1 = first;
-	struct isl_sched_info *info2 = second;
+	struct isl_sched_info *info1 = (struct isl_sched_info *)first;
+	struct isl_sched_info *info2 = (struct isl_sched_info *)second;
 	int n1, n2;
 	int i;
 
@@ -2432,8 +2444,8 @@ static int before(void *first, void *second)
  */
 static int coscheduled(void *first, void *second)
 {
-	struct isl_sched_info *info1 = first;
-	struct isl_sched_info *info2 = second;
+	struct isl_sched_info *info1 = (struct isl_sched_info *)first;
+	struct isl_sched_info *info2 = (struct isl_sched_info *)second;
 	int n1, n2;
 	int i;
 
@@ -2794,7 +2806,8 @@ static void isl_compute_flow_schedule_data_clear(
 static isl_bool count_sink_source(__isl_keep isl_schedule_node *node,
 	void *user)
 {
-	struct isl_compute_flow_schedule_data *data = user;
+	struct isl_compute_flow_schedule_data *data =
+          (struct isl_compute_flow_schedule_data *)user;
 	isl_union_set *domain;
 	isl_union_map *umap;
 	isl_bool r = isl_bool_false;
@@ -2836,7 +2849,8 @@ static isl_bool count_sink_source(__isl_keep isl_schedule_node *node,
  */
 static isl_stat extract_sink_source(__isl_take isl_map *map, void *user)
 {
-	struct isl_compute_flow_schedule_data *data = user;
+	struct isl_compute_flow_schedule_data *data =
+          (struct isl_compute_flow_schedule_data *)user;
 	struct isl_scheduled_access *access;
 
 	if (data->set_sink)
@@ -2878,7 +2892,8 @@ static isl_stat extract_sink_source(__isl_take isl_map *map, void *user)
 static isl_bool collect_sink_source(__isl_keep isl_schedule_node *node,
 	void *user)
 {
-	struct isl_compute_flow_schedule_data *data = user;
+	struct isl_compute_flow_schedule_data *data =
+          (struct isl_compute_flow_schedule_data *)user;
 	isl_union_map *prefix;
 	isl_union_map *umap;
 	isl_bool r = isl_bool_false;
@@ -2938,8 +2953,8 @@ static isl_bool collect_sink_source(__isl_keep isl_schedule_node *node,
  */
 static int before_node(void *first, void *second)
 {
-	isl_schedule_node *node1 = first;
-	isl_schedule_node *node2 = second;
+	isl_schedule_node *node1 = (isl_schedule_node *)first;
+	isl_schedule_node *node2 = (isl_schedule_node *)second;
 	isl_schedule_node *shared;
 	int depth;
 	int before = 0;
@@ -2971,8 +2986,8 @@ static int before_node(void *first, void *second)
  */
 static int coscheduled_node(void *first, void *second)
 {
-	isl_schedule_node *node1 = first;
-	isl_schedule_node *node2 = second;
+	isl_schedule_node *node1 = (isl_schedule_node *)first;
+	isl_schedule_node *node2 = (isl_schedule_node *)second;
 
 	return node1 == node2;
 }

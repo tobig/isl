@@ -209,7 +209,7 @@ void isl_sioimath_print(FILE *out, isl_sioimath_src i, int width)
 
 	big = isl_sioimath_get_big(i);
 	len = mp_int_string_len(big, 10);
-	buf = malloc(len);
+	buf = (char*)malloc(len);
 	mp_int_to_string(big, 10, buf, len);
 	fprintf(out, "%*s", width, buf);
 	free(buf);

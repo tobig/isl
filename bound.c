@@ -252,9 +252,9 @@ int main(int argc, char **argv)
 	obj = isl_stream_read_obj(s);
 	if (obj.type == isl_obj_pw_qpolynomial)
 		pwf = isl_pw_qpolynomial_fold_from_pw_qpolynomial(isl_fold_max,
-								  obj.v);
+			(isl_pw_qpolynomial*)obj.v);
 	else if (obj.type == isl_obj_pw_qpolynomial_fold)
-		pwf = obj.v;
+		pwf = (isl_pw_qpolynomial_fold*)obj.v;
 	else {
 		obj.type->free(obj.v);
 		isl_die(ctx, isl_error_invalid, "invalid input", goto error);

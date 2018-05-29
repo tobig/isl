@@ -331,7 +331,7 @@ static int print_arg_help(struct isl_arg *decl, struct isl_prefixes *prefixes,
 
 const void *isl_memrchr(const void *s, int c, size_t n)
 {
-	const char *p = s;
+	const char *p = (const char *)s;
 	while (n-- > 0)
 		if (p[n] == c)
 			return p + n;
@@ -350,7 +350,7 @@ static int wrap_msg(const char *s, int indent, int pos)
 
 	len = strlen(s);
 	while (len > wrap_len) {
-		const char *space = isl_memrchr(s, ' ', wrap_len);
+		const char *space = (const char*) isl_memrchr(s, ' ', wrap_len);
 		int l;
 
 		if (!space)
@@ -979,7 +979,7 @@ static int isl_arg_str_list_append(struct isl_arg *decl, void *opt,
 	int *n = (int *)(((char *) opt) + decl->u.str_list.offset_n);
 	char **list = *(char ***)(((char *) opt) + decl->offset);
 
-	list = realloc(list, (*n + 1) * sizeof(char *));
+	list = (char**)realloc(list, (*n + 1) * sizeof(char *));
 	if (!list)
 		return -1;
 	*(char ***)(((char *) opt) + decl->offset) = list;

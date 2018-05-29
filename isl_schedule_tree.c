@@ -442,7 +442,7 @@ error:
 isl_bool isl_schedule_tree_is_subtree_anchored(
 	__isl_keep isl_schedule_tree *tree)
 {
-	return tree ? tree->anchored : isl_bool_error;
+	return (isl_bool) (tree ? tree->anchored : isl_bool_error);
 }
 
 /* Does the root node of "tree" depend on its position in the complete
@@ -669,7 +669,7 @@ isl_bool isl_schedule_tree_plain_is_equal(__isl_keep isl_schedule_tree *tree1,
 		equal = isl_set_is_equal(tree1->guard, tree2->guard);
 		break;
 	case isl_schedule_node_mark:
-		equal = tree1->mark == tree2->mark;
+		equal = (isl_bool)(tree1->mark == tree2->mark);
 		break;
 	case isl_schedule_node_leaf:
 	case isl_schedule_node_sequence:
@@ -1528,7 +1528,7 @@ __isl_give isl_id *isl_schedule_tree_mark_get_id(
  */
 static isl_stat set_range_dim(__isl_take isl_map *map, void *user)
 {
-	int *dim = user;
+	int *dim = (int*)user;
 
 	*dim = isl_map_dim(map, isl_dim_out);
 	isl_map_free(map);

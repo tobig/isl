@@ -13,6 +13,7 @@
 #include <string.h>
 #include <isl/val.h>
 #include <isl/space.h>
+#include <isl/options.h>
 #include <isl/map.h>
 #include <isl/schedule_node.h>
 #include <isl_schedule_band.h>
@@ -239,7 +240,7 @@ isl_bool isl_schedule_band_member_get_coincident(
 		isl_die(isl_schedule_band_get_ctx(band), isl_error_invalid,
 			"invalid member position", return isl_bool_error);
 
-	return band->coincident[pos];
+	return (isl_bool)band->coincident[pos];
 }
 
 /* Mark the given scheduling dimension as being coincident or not
@@ -272,7 +273,7 @@ isl_bool isl_schedule_band_get_permutable(__isl_keep isl_schedule_band *band)
 {
 	if (!band)
 		return isl_bool_error;
-	return band->permutable;
+	return (isl_bool)band->permutable;
 }
 
 /* Mark the schedule band permutable or not according to "permutable"?
@@ -595,7 +596,7 @@ static int has_any(__isl_keep isl_union_set *uset,
  */
 static isl_stat is_isolate(__isl_take isl_set *set, void *user)
 {
-	int *found = user;
+	int *found = (int*)user;
 
 	if (isl_set_has_tuple_name(set)) {
 		const char *name;
@@ -623,7 +624,7 @@ static int has_isolate_option(__isl_keep isl_union_set *options)
  */
 static isl_stat is_loop_type_option(__isl_take isl_set *set, void *user)
 {
-	int *found = user;
+	int *found = (int*)user;
 
 	if (isl_set_dim(set, isl_dim_set) == 1 &&
 	    isl_set_has_tuple_name(set)) {
@@ -631,7 +632,8 @@ static isl_stat is_loop_type_option(__isl_take isl_set *set, void *user)
 		enum isl_ast_loop_type type;
 		name = isl_set_get_tuple_name(set);
 		for (type = isl_ast_loop_atomic;
-		    type <= isl_ast_loop_separate; ++type) {
+		    type <= isl_ast_loop_separate;
+                    type = (enum isl_ast_loop_type) ((int)type + 1)) {
 			if (strcmp(name, option_str[type]))
 				continue;
 			*found = 1;
@@ -652,7 +654,7 @@ static isl_stat is_loop_type_option(__isl_take isl_set *set, void *user)
  */
 static isl_stat is_isolate_loop_type_option(__isl_take isl_set *set, void *user)
 {
-	int *found = user;
+	int *found = (int*)user;
 	const char *name;
 	enum isl_ast_loop_type type;
 	isl_map *map;
@@ -671,7 +673,8 @@ static isl_stat is_isolate_loop_type_option(__isl_take isl_set *set, void *user)
 	if (!strcmp(name, "isolate")) {
 		name = isl_map_get_tuple_name(map, isl_dim_out);
 		for (type = isl_ast_loop_atomic;
-		    type <= isl_ast_loop_separate; ++type) {
+                     type <= isl_ast_loop_separate;
+                     type = (enum isl_ast_loop_type) ((int)type + 1)) {
 			if (strcmp(name, option_str[type]))
 				continue;
 			*found = 1;
@@ -710,7 +713,8 @@ static enum isl_ast_loop_type extract_loop_type(
 
 	ctx = isl_union_set_get_ctx(options);
 	for (type = isl_ast_loop_atomic;
-	    type <= isl_ast_loop_separate; ++type) {
+	    type <= isl_ast_loop_separate;
+            type = (enum isl_ast_loop_type) ((int)type + 1)) {
 		isl_space *space;
 		isl_set *option;
 		int empty;
@@ -805,7 +809,8 @@ static __isl_give isl_union_set *loop_types(__isl_take isl_space *space,
 
 	types = isl_union_set_empty(space);
 	for (type = isl_ast_loop_atomic;
-	    type <= isl_ast_loop_separate; ++type) {
+	    type <= isl_ast_loop_separate;
+            type = (enum isl_ast_loop_type) ((int)type + 1)) {
 		isl_set *set;
 
 		space = isl_union_set_get_space(types);

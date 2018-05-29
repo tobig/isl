@@ -675,7 +675,8 @@ static int mod_constraint_is_simpler(struct isl_extract_mod_data *data,
 static isl_stat check_parallel_or_opposite(__isl_take isl_constraint *c,
 	void *user)
 {
-	struct isl_extract_mod_data *data = user;
+	struct isl_extract_mod_data *data =
+                (struct isl_extract_mod_data *)user;
 	enum isl_dim_type c_type[2] = { isl_dim_param, isl_dim_set };
 	enum isl_dim_type a_type[2] = { isl_dim_param, isl_dim_in };
 	int i, t;
@@ -1890,8 +1891,10 @@ static isl_stat add_last_piece(struct isl_from_pw_aff_data *data,
  */
 static int sort_pieces_cmp(const void *p1, const void *p2, void *arg)
 {
-	const struct isl_from_pw_aff_piece *piece1 = p1;
-	const struct isl_from_pw_aff_piece *piece2 = p2;
+	const struct isl_from_pw_aff_piece *piece1 =
+                (const struct isl_from_pw_aff_piece *)p1;
+	const struct isl_from_pw_aff_piece *piece2 =
+                (const struct isl_from_pw_aff_piece *)p2;
 	int n1, n2;
 
 	n1 = isl_set_n_basic_set(piece1->set);
@@ -2118,7 +2121,8 @@ static isl_bool extends_max(struct isl_from_pw_aff_data *data,
 static isl_stat ast_expr_from_pw_aff(__isl_take isl_set *set,
 	__isl_take isl_aff *aff, void *user)
 {
-	struct isl_from_pw_aff_data *data = user;
+	struct isl_from_pw_aff_data *data =
+          (struct isl_from_pw_aff_data *)user;
 	isl_bool test;
 	enum isl_from_pw_aff_state state;
 

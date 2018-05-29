@@ -437,7 +437,7 @@ static struct isl_sched_node *graph_find_node(isl_ctx *ctx,
 	entry = isl_hash_table_find(ctx, graph->node_table, hash,
 				    &node_has_tuples, space, 0);
 
-	return entry ? entry->data : graph->node + graph->n;
+	return (struct isl_sched_node*) ( entry ? entry->data : graph->node + graph->n);
 }
 
 /* Is "node" a node in "graph"?
@@ -450,8 +450,8 @@ static int is_node(struct isl_sched_graph *graph,
 
 static int edge_has_src_and_dst(const void *entry, const void *val)
 {
-	const struct isl_sched_edge *edge = entry;
-	const struct isl_sched_edge *temp = val;
+	const struct isl_sched_edge *edge = (const struct isl_sched_edge *)entry;
+	const struct isl_sched_edge *temp = (const struct isl_sched_edge *)val;
 
 	return edge->src == temp->src && edge->dst == temp->dst;
 }
@@ -485,7 +485,8 @@ static isl_stat graph_edge_tables_add(isl_ctx *ctx,
 {
 	enum isl_edge_type t;
 
-	for (t = isl_edge_first; t <= isl_edge_last; ++t) {
+	for (t = isl_edge_first; t <= isl_edge_last;
+            t = (enum isl_edge_type)((int)t +1)) {
 		if (!is_type(edge, t))
 			continue;
 		if (graph_edge_table_add(ctx, graph, t, edge) < 0)
@@ -547,7 +548,7 @@ static struct isl_sched_edge *graph_find_edge(struct isl_sched_graph *graph,
 	if (!entry)
 		return NULL;
 
-	return entry->data;
+	return (struct isl_sched_edge*)entry->data;
 }
 
 /* Check whether the dependence graph has an edge of the given type
@@ -568,7 +569,7 @@ static isl_bool graph_has_edge(struct isl_sched_graph *graph,
 	if (empty < 0)
 		return isl_bool_error;
 
-	return !empty;
+	return (isl_bool)!empty;
 }
 
 /* Look for any edge with the same src, dst and map fields as "model".
@@ -583,7 +584,8 @@ static struct isl_sched_edge *graph_find_matching_edge(
 	enum isl_edge_type i;
 	struct isl_sched_edge *edge;
 
-	for (i = isl_edge_first; i <= isl_edge_last; ++i) {
+	for (i = isl_edge_first; i <= isl_edge_last;
+             i = (enum isl_edge_type) ((int)i + 1)) {
 		int is_equal;
 
 		edge = graph_find_edge(graph, i, model->src, model->dst);
@@ -607,7 +609,8 @@ static void graph_remove_edge(struct isl_sched_graph *graph,
 	isl_ctx *ctx = isl_map_get_ctx(edge->map);
 	enum isl_edge_type i;
 
-	for (i = isl_edge_first; i <= isl_edge_last; ++i) {
+	for (i = isl_edge_first; i <= isl_edge_last;
+             i = (enum isl_edge_type) ((int)i + 1)) {
 		struct isl_hash_table_entry *entry;
 
 		entry = graph_find_edge_entry(graph, i, edge->src, edge->dst);
@@ -628,7 +631,8 @@ static isl_bool graph_has_any_edge(struct isl_sched_graph *graph,
 	enum isl_edge_type i;
 	isl_bool r;
 
-	for (i = isl_edge_first; i <= isl_edge_last; ++i) {
+	for (i = isl_edge_first; i <= isl_edge_last;
+             i = (enum isl_edge_type) ((int)i + 1)) {
 		r = graph_has_edge(graph, i, src, dst);
 		if (r < 0 || r)
 			return r;
@@ -747,7 +751,7 @@ static void graph_free(isl_ctx *ctx, struct isl_sched_graph *graph)
  */
 static isl_stat init_n_maxvar(__isl_take isl_set *set, void *user)
 {
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *)user;
 	int nvar = isl_set_dim(set, isl_dim_set);
 
 	graph->n++;
@@ -1088,7 +1092,7 @@ static isl_stat extract_node(__isl_take isl_set *set, void *user)
 	isl_set *hull_set;
 	isl_morph *morph;
 	isl_multi_aff *compress, *decompress;
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *)user;
 
 	hull = isl_set_affine_hull(isl_set_copy(set));
 	hull = isl_basic_set_remove_divs(hull);
@@ -1306,7 +1310,7 @@ static isl_stat extract_edge(__isl_take isl_map *map, void *user)
 {
 	isl_bool empty;
 	isl_ctx *ctx = isl_map_get_ctx(map);
-	struct isl_extract_edge_data *data = user;
+	struct isl_extract_edge_data *data = (struct isl_extract_edge_data *)user;
 	struct isl_sched_graph *graph = data->graph;
 	struct isl_sched_node *src, *dst;
 	struct isl_sched_edge *edge;
@@ -1420,7 +1424,8 @@ static isl_stat graph_init(struct isl_sched_graph *graph,
 		return isl_stat_error;
 	if (graph_init_table(ctx, graph) < 0)
 		return isl_stat_error;
-	for (i = isl_edge_first; i <= isl_edge_last; ++i) {
+	for (i = isl_edge_first; i <= isl_edge_last;
+             i = (enum isl_edge_type) ((int)i + 1)) {
 		c = isl_schedule_constraints_get(sc, i);
 		graph->max_edge[i] = isl_union_map_n_map(c);
 		isl_union_map_free(c);
@@ -1431,7 +1436,8 @@ static isl_stat graph_init(struct isl_sched_graph *graph,
 		return isl_stat_error;
 	graph->n_edge = 0;
 	data.graph = graph;
-	for (i = isl_edge_first; i <= isl_edge_last; ++i) {
+	for (i = isl_edge_first; i <= isl_edge_last;
+             i = (enum isl_edge_type) ((int)i + 1)) {
 		isl_stat r;
 
 		data.type = i;
@@ -1451,7 +1457,7 @@ static isl_stat graph_init(struct isl_sched_graph *graph,
 static isl_bool node_follows_weak(int i, int j, void *user)
 {
 	isl_bool f;
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *)user;
 
 	f = graph_has_any_edge(graph, &graph->node[j], &graph->node[i]);
 	if (f < 0 || f)
@@ -1464,7 +1470,7 @@ static isl_bool node_follows_weak(int i, int j, void *user)
  */
 static isl_bool node_follows_strong(int i, int j, void *user)
 {
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *)user;
 
 	return graph_has_validity_edge(graph, &graph->node[j], &graph->node[i]);
 }
@@ -1522,9 +1528,9 @@ static isl_stat detect_wccs(isl_ctx *ctx, struct isl_sched_graph *graph)
 
 static int cmp_scc(const void *a, const void *b, void *data)
 {
-	struct isl_sched_graph *graph = data;
-	const int *i1 = a;
-	const int *i2 = b;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *)data;
+	const int *i1 = (const int *) a;
+	const int *i2 = (const int *) b;
 
 	return graph->node[*i1].scc - graph->node[*i2].scc;
 }
@@ -2804,7 +2810,7 @@ static isl_stat setup_lp(isl_ctx *ctx, struct isl_sched_graph *graph,
 static int check_conflict(int con, void *user)
 {
 	int i;
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph*)user;
 
 	if (graph->src_scc >= 0)
 		return 0;
@@ -3992,7 +3998,7 @@ static struct isl_sched_node *graph_find_compressed_node(isl_ctx *ctx,
 		return node;
 
 	id = isl_space_get_tuple_id(space, isl_dim_set);
-	node = isl_id_get_user(id);
+	node = (struct isl_sched_node*)isl_id_get_user(id);
 	isl_id_free(id);
 
 	if (!node)
@@ -4037,7 +4043,8 @@ struct isl_add_all_constraints_data {
  */
 static isl_stat lp_add_intra(__isl_take isl_basic_set *coef, void *user)
 {
-	struct isl_add_all_constraints_data *data = user;
+	struct isl_add_all_constraints_data *data =
+                (struct isl_add_all_constraints_data *)user;
 	isl_space *space;
 	struct isl_sched_node *node;
 
@@ -4061,7 +4068,8 @@ static isl_stat lp_add_intra(__isl_take isl_basic_set *coef, void *user)
  */
 static isl_stat lp_add_inter(__isl_take isl_basic_set *coef, void *user)
 {
-	struct isl_add_all_constraints_data *data = user;
+	struct isl_add_all_constraints_data *data =
+                (struct isl_add_all_constraints_data *)user;
 	isl_space *space, *dom;
 	struct isl_sched_node *src, *dst;
 	int pos;
@@ -4113,7 +4121,8 @@ struct isl_sched_count {
  */
 static isl_stat bset_update_count(__isl_take isl_basic_set *bset, void *user)
 {
-	struct isl_sched_count *data = user;
+	struct isl_sched_count *data =
+                (struct isl_sched_count *) user;
 
 	return update_count(bset, 1, &data->n_eq, &data->n_ineq);
 }
@@ -4672,7 +4681,8 @@ struct isl_collect_bounds_data {
  */
 static isl_stat collect_bounds(__isl_take isl_set *set, void *user)
 {
-	struct isl_collect_bounds_data *data = user;
+	struct isl_collect_bounds_data *data =
+                (struct isl_collect_bounds_data *)user;
 	struct isl_sched_node *node;
 	isl_space *space;
 	isl_set *bounds;
@@ -4783,7 +4793,8 @@ error:
  */
 static isl_stat add_lineality(__isl_take isl_set *set, void *user)
 {
-	struct isl_exploit_lineality_data *data = user;
+	struct isl_exploit_lineality_data *data =
+                (struct isl_exploit_lineality_data *) user;
 	isl_basic_set *hull;
 	int dim, n_eq;
 
@@ -5899,7 +5910,8 @@ struct isl_mark_merge_sccs_data {
  */
 static isl_bool cluster_follows(int i, int j, void *user)
 {
-	struct isl_mark_merge_sccs_data *data = user;
+	struct isl_mark_merge_sccs_data *data =
+                (struct isl_mark_merge_sccs_data *) user;
 	struct isl_sched_graph *graph = data->graph;
 	int *scc_cluster = data->scc_cluster;
 
@@ -6091,7 +6103,8 @@ static __isl_give isl_schedule_constraints *add_non_conditional_constraints(
 	if (!sc)
 		return NULL;
 
-	for (t = isl_edge_first; t <= isl_edge_last; ++t) {
+	for (t = isl_edge_first; t <= isl_edge_last;
+             t = (enum isl_edge_type) ((int) t + 1)) {
 		if (t == isl_edge_condition ||
 		    t == isl_edge_conditional_validity)
 			continue;
@@ -6116,7 +6129,8 @@ static __isl_give isl_schedule_constraints *add_conditional_constraints(
 	enum isl_edge_type t;
 	isl_union_map *tagged;
 
-	for (t = isl_edge_condition; t <= isl_edge_conditional_validity; ++t) {
+	for (t = isl_edge_condition; t <= isl_edge_conditional_validity;
+             t = (enum isl_edge_type) ((int) t + 1)) {
 		if (!is_type(edge, t))
 			continue;
 		if (t == isl_edge_condition)
@@ -6406,7 +6420,7 @@ static isl_bool ok_to_merge_coincident(struct isl_clustering *c,
 
 	n_coincident = get_n_coincident(merge_graph);
 
-	return n_coincident >= max_coincident;
+	return (isl_bool)(n_coincident >= max_coincident);
 }
 
 /* Return the transformation on "node" expressed by the current (and only)
@@ -7015,7 +7029,7 @@ static isl_stat copy_partial(struct isl_sched_graph *graph,
  */
 static isl_bool node_follows_strong_or_same_cluster(int i, int j, void *user)
 {
-	struct isl_sched_graph *graph = user;
+	struct isl_sched_graph *graph = (struct isl_sched_graph *) user;
 
 	if (graph->node[i].cluster == graph->node[j].cluster)
 		return isl_bool_true;

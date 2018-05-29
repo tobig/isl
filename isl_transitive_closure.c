@@ -1770,7 +1770,8 @@ struct isl_tc_follows_data {
  */
 static isl_bool basic_map_follows(int i, int j, void *user)
 {
-	struct isl_tc_follows_data *data = user;
+	struct isl_tc_follows_data *data =
+                (struct isl_tc_follows_data*) user;
 	struct isl_map *map12 = NULL;
 	struct isl_map *map21 = NULL;
 	isl_bool subset;
@@ -1812,7 +1813,7 @@ static isl_bool basic_map_follows(int i, int j, void *user)
 	if (subset)
 		data->check_closed = 1;
 
-	return subset < 0 ? isl_bool_error : !subset;
+	return (isl_bool)(subset < 0 ? isl_bool_error : !subset);
 error:
 	isl_map_free(map21);
 	return isl_bool_error;
@@ -2566,8 +2567,9 @@ error:
 }
 
 static isl_stat inc_count(__isl_take isl_map *map, void *user)
+
 {
-	int *n = user;
+	int *n = (int*) user;
 
 	*n += map->n;
 
@@ -2579,7 +2581,7 @@ static isl_stat inc_count(__isl_take isl_map *map, void *user)
 static isl_stat collect_basic_map(__isl_take isl_map *map, void *user)
 {
 	int i;
-	isl_basic_map ***next = user;
+	isl_basic_map ***next = (isl_basic_map ***) user;
 
 	for (i = 0; i < map->n; ++i) {
 		**next = isl_basic_map_copy(map->p[i]);
@@ -2862,7 +2864,7 @@ struct isl_union_power {
 
 static isl_stat power(__isl_take isl_map *map, void *user)
 {
-	struct isl_union_power *up = user;
+	struct isl_union_power *up = (struct isl_union_power *) user;
 
 	map = isl_map_power(map, up->exact);
 	up->pow = isl_union_map_from_map(map);

@@ -383,9 +383,9 @@ S(LIST(EL),sort_data) {
  */
 static int FN(LIST(EL),cmp)(const void *a, const void *b, void *user)
 {
-	S(LIST(EL),sort_data) *data = user;
-	EL * const *el1 = a;
-	EL * const *el2 = b;
+	S(LIST(EL),sort_data) *data = (S(LIST(EL),sort_data)*)user;
+	EL * const *el1 = (EL* const*) a;
+	EL * const *el2 = (EL* const*) b;
 
 	return data->cmp(*el1, *el2, data->user);
 }
@@ -430,7 +430,8 @@ S(LIST(EL),foreach_scc_data) {
  */
 static isl_bool FN(LIST(EL),follows)(int i, int j, void *user)
 {
-	S(LIST(EL),foreach_scc_data) *data = user;
+	S(LIST(EL),foreach_scc_data) *data =
+                (S(LIST(EL),foreach_scc_data)*)user;
 
 	return data->follows(data->list->p[i], data->list->p[j],
 				data->follows_user);

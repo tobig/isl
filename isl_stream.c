@@ -24,7 +24,7 @@ static int same_name(const void *entry, const void *val)
 {
 	const struct isl_keyword *keyword = (const struct isl_keyword *)entry;
 
-	return !strcmp(keyword->name, val);
+	return !strcmp(keyword->name, (const char*) val);
 }
 
 enum isl_token_type isl_stream_register_keyword(__isl_keep isl_stream *s,
@@ -48,14 +48,14 @@ enum isl_token_type isl_stream_register_keyword(__isl_keep isl_stream *s,
 	if (!entry)
 		return ISL_TOKEN_ERROR;
 	if (entry->data) {
-		keyword = entry->data;
+		keyword = (struct isl_keyword*) entry->data;
 		return keyword->type;
 	}
 
 	keyword = isl_calloc_type(s->ctx, struct isl_keyword);
 	if (!keyword)
 		return ISL_TOKEN_ERROR;
-	keyword->type = s->next_type++;
+	keyword->type = (enum isl_token_type)((int)s->next_type + 1);
 	keyword->name = strdup(name);
 	if (!keyword->name) {
 		free(keyword);
@@ -346,7 +346,7 @@ static enum isl_token_type check_keywords(__isl_keep isl_stream *s)
 	entry = isl_hash_table_find(s->ctx, s->keywords, name_hash, same_name,
 					s->buffer, 0);
 	if (entry) {
-		keyword = entry->data;
+		keyword = (struct isl_keyword*) entry->data;
 		return keyword->type;
 	}
 
@@ -754,7 +754,7 @@ int isl_stream_is_empty(__isl_keep isl_stream *s)
 
 static isl_stat free_keyword(void **p, void *user)
 {
-	struct isl_keyword *keyword = *p;
+	struct isl_keyword *keyword = (struct isl_keyword*) *p;
 
 	free(keyword->name);
 	free(keyword);

@@ -171,7 +171,8 @@ static int count_same_name(__isl_keep isl_space *dim,
 	unsigned p, s;
 	int count = 0;
 
-	for (t = isl_dim_param; t <= type && t <= isl_dim_out; ++t) {
+	for (t = isl_dim_param; t <= type && t <= isl_dim_out;
+             t = (enum isl_dim_type) ((int)t +1)) {
 		s = t == type ? pos : isl_space_dim(dim, t);
 		for (p = 0; p < s; ++p) {
 			const char *n = isl_space_get_dim_name(dim, t, p);
@@ -255,7 +256,7 @@ static isl_bool can_print_div_expr(__isl_keep isl_printer *p,
 		return isl_bool_false;
 	if (!div)
 		return isl_bool_false;
-	return !isl_int_is_zero(div->row[pos][0]);
+	return (isl_bool)(!isl_int_is_zero(div->row[pos][0]));
 }
 
 static __isl_give isl_printer *print_div(__isl_keep isl_space *dim,
@@ -1360,7 +1361,7 @@ static int defining_equality(__isl_keep isl_basic_map *eq,
 static __isl_give isl_printer *print_dim_eq(__isl_take isl_printer *p,
 	struct isl_print_space_data *data, unsigned pos)
 {
-	isl_basic_map *eq = data->user;
+	isl_basic_map *eq = (isl_basic_map*)data->user;
 	int j;
 
 	j = defining_equality(eq, data->space, data->type, pos);
@@ -2929,7 +2930,7 @@ __isl_give isl_printer *isl_printer_print_union_pw_aff(
 static __isl_give isl_printer *print_dim_ma(__isl_take isl_printer *p,
 	struct isl_print_space_data *data, unsigned pos)
 {
-	isl_multi_aff *ma = data->user;
+	isl_multi_aff *ma = (isl_multi_aff*)data->user;
 
 	if (data->type == isl_dim_out)
 		p = print_aff_body(p, ma->u.p[pos]);
@@ -3159,7 +3160,7 @@ static __isl_give isl_printer *print_dim_mpa(__isl_take isl_printer *p,
 {
 	int i;
 	int need_parens;
-	isl_multi_pw_aff *mpa = data->user;
+	isl_multi_pw_aff *mpa = (isl_multi_pw_aff*)data->user;
 	isl_pw_aff *pa;
 
 	if (data->type != isl_dim_out)
@@ -3243,7 +3244,7 @@ __isl_give isl_printer *isl_printer_print_multi_pw_aff(
 static __isl_give isl_printer *print_dim_mv(__isl_take isl_printer *p,
 	struct isl_print_space_data *data, unsigned pos)
 {
-	isl_multi_val *mv = data->user;
+	isl_multi_val *mv = (isl_multi_val*) data->user;
 
 	if (data->type == isl_dim_out)
 		return isl_printer_print_val(p, mv->u.p[pos]);
@@ -3297,7 +3298,7 @@ __isl_give isl_printer *isl_printer_print_multi_val(
 static __isl_give isl_printer *print_union_pw_aff_dim(__isl_take isl_printer *p,
 	struct isl_print_space_data *data, unsigned pos)
 {
-	isl_multi_union_pw_aff *mupa = data->user;
+	isl_multi_union_pw_aff *mupa = (isl_multi_union_pw_aff*) data->user;
 	isl_union_pw_aff *upa;
 
 	upa = isl_multi_union_pw_aff_get_union_pw_aff(mupa, pos);

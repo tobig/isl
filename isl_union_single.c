@@ -42,7 +42,7 @@ S(UNION,foreach_data)
 
 static isl_stat FN(UNION,call_on_copy)(void **entry, void *user)
 {
-	PART *part = *entry;
+	PART *part = (PART*)*entry;
 	S(UNION,foreach_data) *data = (S(UNION,foreach_data) *)user;
 
 	part = FN(PART,copy)(part);
@@ -106,7 +106,7 @@ static struct isl_hash_table_entry *FN(UNION,find_part_entry)(
 		return reserve ? NULL : isl_hash_table_entry_none;
 	if (reserve && !entry->data)
 		return entry;
-	part = entry->data;
+	part = (PART*)entry->data;
 	equal = isl_space_tuple_is_equal(part->dim, isl_dim_out,
 					    space, isl_dim_out);
 	if (equal < 0)
@@ -132,7 +132,7 @@ static __isl_give UNION *FN(UNION,remove_part_entry)(__isl_take UNION *u,
 
 	ctx = FN(UNION,get_ctx)(u);
 	isl_hash_table_remove(ctx, &u->table, part_entry);
-	FN(PART,free)(part_entry->data);
+	FN(PART,free)((PART*)part_entry->data);
 
 	return u;
 }
@@ -184,12 +184,12 @@ static isl_bool FN(UNION,has_single_reference)(__isl_keep UNION *u)
 {
 	if (!u)
 		return isl_bool_error;
-	return u->ref == 1;
+	return (isl_bool)(u->ref == 1);
 }
 
 static isl_stat FN(UNION,free_u_entry)(void **entry, void *user)
 {
-	PART *part = *entry;
+	PART *part = (PART*)*entry;
 	FN(PART,free)(part);
 	return isl_stat_ok;
 }

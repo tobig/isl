@@ -115,11 +115,11 @@ __isl_give isl_id *isl_id_alloc(isl_ctx *ctx, const char *name, void *user)
 	if (!entry)
 		return NULL;
 	if (entry->data)
-		return isl_id_copy(entry->data);
+		return isl_id_copy((isl_id*)entry->data);
 	entry->data = id_alloc(ctx, name, user);
 	if (!entry->data)
 		ctx->id_table.n--;
-	return entry->data;
+	return (isl_id*)entry->data;
 }
 
 /* If the id has a negative refcount, then it is a static isl_id

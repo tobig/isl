@@ -1489,7 +1489,7 @@ isl_bool FN(MULTI(BASE),plain_is_equal)(__isl_keep MULTI(BASE) *multi1,
 		return equal;
 
 	for (i = 0; i < multi1->n; ++i) {
-		equal = FN(EL,plain_is_equal)(multi1->u.p[i], multi2->u.p[i]);
+		equal = (isl_bool)FN(EL,plain_is_equal)(multi1->u.p[i], multi2->u.p[i]);
 		if (equal < 0 || !equal)
 			return equal;
 	}

@@ -345,7 +345,7 @@ isl_bool isl_ast_expr_is_equal(__isl_keep isl_ast_expr *expr1,
 	case isl_ast_expr_int:
 		return isl_val_eq(expr1->u.v, expr2->u.v);
 	case isl_ast_expr_id:
-		return expr1->u.id == expr2->u.id;
+		return (isl_bool)(expr1->u.id == expr2->u.id);
 	case isl_ast_expr_op:
 		if (expr1->u.op.op != expr2->u.op.op)
 			return isl_bool_false;
@@ -1120,7 +1120,7 @@ isl_bool isl_ast_node_for_is_degenerate(__isl_keep isl_ast_node *node)
 	if (node->type != isl_ast_node_for)
 		isl_die(isl_ast_node_get_ctx(node), isl_error_invalid,
 			"not a for node", return isl_bool_error);
-	return node->u.f.degenerate;
+	return (isl_bool)node->u.f.degenerate;
 }
 
 __isl_give isl_ast_expr *isl_ast_node_for_get_iterator(
@@ -1227,7 +1227,7 @@ isl_bool isl_ast_node_if_has_else(
 	if (node->type != isl_ast_node_if)
 		isl_die(isl_ast_node_get_ctx(node), isl_error_invalid,
 			"not an if node", return isl_bool_error);
-	return node->u.i.else_node != NULL;
+	return (isl_bool)(node->u.i.else_node != NULL);
 }
 
 __isl_give isl_ast_node *isl_ast_node_if_get_else(
@@ -1601,7 +1601,7 @@ static void *create_names(isl_ctx *ctx)
 static void free_names(void *user)
 {
 	int i;
-	struct isl_ast_op_names *names = user;
+	struct isl_ast_op_names *names = (struct isl_ast_op_names *)user;
 
 	if (!user)
 		return;
@@ -1695,7 +1695,7 @@ __isl_give isl_printer *isl_ast_op_type_set_print_name(
 
 	id = names_id(isl_printer_get_ctx(p));
 	p = alloc_names(p, id);
-	names = get_note(p, id);
+	names = (struct isl_ast_op_names*)get_note(p, id);
 	isl_id_free(id);
 	if (!names)
 		return isl_printer_free(p);
@@ -1721,7 +1721,7 @@ static const char *get_op_str_c(__isl_keep isl_printer *p,
 	id = names_id(isl_printer_get_ctx(p));
 	has_names = isl_printer_has_note(p, id);
 	if (has_names >= 0 && has_names)
-		names = get_note(p, id);
+		names = (struct isl_ast_op_names*)get_note(p, id);
 	isl_id_free(id);
 	if (names && names->op_str[type])
 		return names->op_str[type];
@@ -2649,7 +2649,7 @@ static isl_bool already_printed_once(__isl_keep isl_printer *p,
 
 	id = printed_id(isl_printer_get_ctx(p));
 	p = alloc_printed(p, id);
-	printed = get_note(p, id);
+	printed = (struct isl_ast_op_printed*)get_note(p, id);
 	isl_id_free(id);
 	if (!printed)
 		return isl_bool_error;
@@ -2759,7 +2759,7 @@ isl_stat isl_ast_node_foreach_ast_op_type(__isl_keep isl_ast_node *node,
 
 static isl_stat ast_op_type_print_macro(enum isl_ast_op_type type, void *user)
 {
-	isl_printer **p = user;
+	isl_printer **p = (isl_printer **)user;
 
 	*p = isl_ast_op_type_print_macro(type, *p);
 

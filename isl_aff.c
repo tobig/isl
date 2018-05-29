@@ -582,7 +582,7 @@ isl_bool isl_aff_plain_is_zero(__isl_keep isl_aff *aff)
 
 	if (isl_int_is_zero(aff->v->el[0]))
 		return isl_bool_false;
-	return isl_seq_first_non_zero(aff->v->el + 1, aff->v->size - 1) < 0;
+	return (isl_bool)(isl_seq_first_non_zero(aff->v->el + 1, aff->v->size - 1) < 0);
 }
 
 /* Does "aff" represent NaN?
@@ -592,7 +592,7 @@ isl_bool isl_aff_is_nan(__isl_keep isl_aff *aff)
 	if (!aff)
 		return isl_bool_error;
 
-	return isl_seq_first_non_zero(aff->v->el, 2) < 0;
+	return (isl_bool)(isl_seq_first_non_zero(aff->v->el, 2) < 0);
 }
 
 /* Are "aff1" and "aff2" obviously equal?
@@ -3367,7 +3367,7 @@ isl_bool isl_aff_is_cst(__isl_keep isl_aff *aff)
 	if (!aff)
 		return isl_bool_error;
 
-	return isl_seq_first_non_zero(aff->v->el + 2, aff->v->size - 2) == -1;
+	return (isl_bool)(isl_seq_first_non_zero(aff->v->el + 2, aff->v->size - 2) == -1);
 }
 
 /* Check whether pwaff is a piecewise constant.
@@ -5301,7 +5301,7 @@ __isl_give isl_pw_multi_aff *isl_pw_multi_aff_from_set(__isl_take isl_set *set)
  */
 static isl_stat pw_multi_aff_from_map(__isl_take isl_map *map, void *user)
 {
-	isl_union_pw_multi_aff **upma = user;
+	isl_union_pw_multi_aff **upma = (isl_union_pw_multi_aff **)user;
 	isl_pw_multi_aff *pma;
 
 	pma = isl_pw_multi_aff_from_map(map);
@@ -5954,7 +5954,7 @@ __isl_give isl_pw_multi_aff *isl_pw_multi_aff_from_domain(
 static isl_stat add_pw_multi_aff_from_domain(__isl_take isl_set *set,
 	void *user)
 {
-	isl_union_pw_multi_aff **upma = user;
+	isl_union_pw_multi_aff **upma = (isl_union_pw_multi_aff **)user;
 	isl_pw_multi_aff *pma;
 
 	pma = isl_pw_multi_aff_from_domain(set);
@@ -5995,7 +5995,7 @@ error:
 static isl_stat map_from_pw_multi_aff(__isl_take isl_pw_multi_aff *pma,
 	void *user)
 {
-	isl_union_map **umap = user;
+	isl_union_map **umap = (isl_union_map **)user;
 	isl_map *map;
 
 	map = isl_map_from_pw_multi_aff(pma);
@@ -6046,7 +6046,8 @@ struct isl_union_pw_multi_aff_bin_data {
  */
 static isl_stat bin_entry(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	struct isl_union_pw_multi_aff_bin_data *data = user;
+	struct isl_union_pw_multi_aff_bin_data *data =
+                (struct isl_union_pw_multi_aff_bin_data *)user;
 	isl_stat r;
 
 	data->pma = pma;
@@ -6149,7 +6150,8 @@ __isl_give isl_pw_multi_aff *isl_pw_multi_aff_flat_range_product(
 static isl_stat flat_range_product_entry(__isl_take isl_pw_multi_aff *pma2,
 	void *user)
 {
-	struct isl_union_pw_multi_aff_bin_data *data = user;
+	struct isl_union_pw_multi_aff_bin_data *data =
+                (struct isl_union_pw_multi_aff_bin_data *)user;
 
 	if (!isl_space_tuple_is_equal(data->pma->dim, isl_dim_in,
 				 pma2->dim, isl_dim_in)) {
@@ -6397,7 +6399,7 @@ error:
 static __isl_give isl_pw_multi_aff *union_pw_multi_aff_scale_multi_val_entry(
 	__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	isl_multi_val *mv = user;
+	isl_multi_val *mv = (isl_multi_val *)user;
 
 	if (!pma)
 		return NULL;
@@ -7526,7 +7528,8 @@ struct isl_union_pw_multi_aff_multi_val_on_domain_data {
 static isl_stat pw_multi_aff_multi_val_on_domain(__isl_take isl_set *domain,
 	void *user)
 {
-	struct isl_union_pw_multi_aff_multi_val_on_domain_data *data = user;
+	struct isl_union_pw_multi_aff_multi_val_on_domain_data *data =
+                (struct isl_union_pw_multi_aff_multi_val_on_domain_data *)user;
 	isl_pw_multi_aff *pma;
 	isl_multi_val *mv;
 
@@ -7562,7 +7565,8 @@ __isl_give isl_union_pw_multi_aff *isl_union_pw_multi_aff_multi_val_on_domain(
  */
 static isl_stat pullback_entry(__isl_take isl_pw_multi_aff *pma2, void *user)
 {
-	struct isl_union_pw_multi_aff_bin_data *data = user;
+	struct isl_union_pw_multi_aff_bin_data *data =
+                (struct isl_union_pw_multi_aff_bin_data *)user;
 
 	if (!isl_space_tuple_is_equal(data->pma->dim, isl_dim_in,
 				 pma2->dim, isl_dim_out)) {
@@ -7664,7 +7668,8 @@ struct isl_union_pw_aff_reset_params_data {
  */
 static isl_stat reset_params(__isl_take isl_pw_aff *pa, void *user)
 {
-	struct isl_union_pw_aff_reset_params_data *data = user;
+	struct isl_union_pw_aff_reset_params_data *data =
+                (struct isl_union_pw_aff_reset_params_data *)user;
 	isl_space *space;
 
 	space = isl_pw_aff_get_space(pa);
@@ -7768,7 +7773,8 @@ struct isl_union_pw_multi_aff_get_union_pw_aff_data {
  */
 static isl_stat get_union_pw_aff(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	struct isl_union_pw_multi_aff_get_union_pw_aff_data *data = user;
+	struct isl_union_pw_multi_aff_get_union_pw_aff_data *data =
+                (struct isl_union_pw_multi_aff_get_union_pw_aff_data *)user;
 	int n_out;
 	isl_pw_aff *pa;
 
@@ -7860,7 +7866,8 @@ struct isl_union_pw_aff_pw_aff_on_domain_data {
  */
 static isl_stat pw_aff_on_domain(__isl_take isl_set *domain, void *user)
 {
-	struct isl_union_pw_aff_pw_aff_on_domain_data *data = user;
+	struct isl_union_pw_aff_pw_aff_on_domain_data *data =
+                (struct isl_union_pw_aff_pw_aff_on_domain_data *)user;
 	isl_pw_aff *pa;
 	int dim;
 
@@ -7957,7 +7964,8 @@ struct isl_union_pw_aff_val_on_domain_data {
  */
 static isl_stat pw_aff_val_on_domain(__isl_take isl_set *domain, void *user)
 {
-	struct isl_union_pw_aff_val_on_domain_data *data = user;
+	struct isl_union_pw_aff_val_on_domain_data *data =
+                (struct isl_union_pw_aff_val_on_domain_data *)user;
 	isl_pw_aff *pa;
 	isl_val *v;
 
@@ -7996,7 +8004,7 @@ __isl_give isl_union_pw_aff *isl_union_pw_aff_val_on_domain(
 static isl_stat pw_multi_aff_from_pw_aff_entry(__isl_take isl_pw_aff *pa,
 	void *user)
 {
-	isl_union_pw_multi_aff **upma = user;
+	isl_union_pw_multi_aff **upma = (isl_union_pw_multi_aff **)user;
 	isl_pw_multi_aff *pma;
 
 	pma = isl_pw_multi_aff_from_pw_aff(pa);
@@ -8060,7 +8068,7 @@ __isl_give isl_union_set *isl_union_pw_aff_zero_union_set(
  */
 static isl_stat map_from_pw_aff_entry(__isl_take isl_pw_aff *pa, void *user)
 {
-	isl_union_map **umap = user;
+	isl_union_map **umap = (isl_union_map **)user;
 	isl_map *map;
 
 	map = isl_map_from_pw_aff(pa);
@@ -8109,7 +8117,8 @@ struct isl_union_pw_aff_pullback_upma_data {
  */
 static isl_stat pa_pb_pma(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	struct isl_union_pw_aff_pullback_upma_data *data = user;
+	struct isl_union_pw_aff_pullback_upma_data *data =
+          (struct isl_union_pw_aff_pullback_upma_data *)user;
 	isl_pw_aff *pa;
 
 	if (!isl_space_tuple_is_equal(data->pa->dim, isl_dim_in,
@@ -8131,7 +8140,8 @@ static isl_stat pa_pb_pma(__isl_take isl_pw_multi_aff *pma, void *user)
  */
 static isl_stat upa_pb_upma(__isl_take isl_pw_aff *pa, void *user)
 {
-	struct isl_union_pw_aff_pullback_upma_data *data = user;
+	struct isl_union_pw_aff_pullback_upma_data *data =
+          (struct isl_union_pw_aff_pullback_upma_data *)user;
 	isl_stat r;
 
 	data->pa = pa;
@@ -8396,7 +8406,7 @@ __isl_give isl_multi_union_pw_aff *isl_multi_union_pw_aff_from_multi_pw_aff(
  */
 static isl_stat extract_space(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	isl_space **space = user;
+	isl_space **space = (isl_space **)user;
 	isl_space *pma_space;
 	isl_bool equal;
 
@@ -8769,7 +8779,8 @@ struct isl_union_pw_multi_aff_reset_range_space_data {
  */
 static isl_stat reset_range_space(__isl_take isl_pw_multi_aff *pma, void *user)
 {
-	struct isl_union_pw_multi_aff_reset_range_space_data *data = user;
+	struct isl_union_pw_multi_aff_reset_range_space_data *data =
+          (struct isl_union_pw_multi_aff_reset_range_space_data *)user;
 	isl_space *space;
 
 	space = isl_pw_multi_aff_get_space(pma);

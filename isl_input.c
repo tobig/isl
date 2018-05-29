@@ -2438,16 +2438,18 @@ error:
 static struct isl_obj to_union(isl_ctx *ctx, struct isl_obj obj)
 {
 	if (obj.type == isl_obj_map) {
-		obj.v = isl_union_map_from_map(obj.v);
+		obj.v = isl_union_map_from_map((isl_map*)obj.v);
 		obj.type = isl_obj_union_map;
 	} else if (obj.type == isl_obj_set) {
-		obj.v = isl_union_set_from_set(obj.v);
+		obj.v = isl_union_set_from_set((isl_set*)obj.v);
 		obj.type = isl_obj_union_set;
 	} else if (obj.type == isl_obj_pw_qpolynomial) {
-		obj.v = isl_union_pw_qpolynomial_from_pw_qpolynomial(obj.v);
+		obj.v = isl_union_pw_qpolynomial_from_pw_qpolynomial(
+                  (isl_pw_qpolynomial*)obj.v);
 		obj.type = isl_obj_union_pw_qpolynomial;
 	} else if (obj.type == isl_obj_pw_qpolynomial_fold) {
-		obj.v = isl_union_pw_qpolynomial_fold_from_pw_qpolynomial_fold(obj.v);
+		obj.v = isl_union_pw_qpolynomial_fold_from_pw_qpolynomial_fold(
+                  (isl_pw_qpolynomial_fold*)obj.v);
 		obj.type = isl_obj_union_pw_qpolynomial_fold;
 	} else
 		isl_assert(ctx, 0, goto error);
@@ -2489,21 +2491,25 @@ static struct isl_obj obj_add(__isl_keep isl_stream *s,
 	if (!obj1.type->add)
 		isl_die(s->ctx, isl_error_internal,
 			"combination not supported on object type", goto error);
-	if (obj1.type == isl_obj_map && !isl_map_has_equal_space(obj1.v, obj2.v)) {
+	if (obj1.type == isl_obj_map &&
+            !isl_map_has_equal_space((isl_map*)obj1.v, (isl_map*)obj2.v)) {
 		obj1 = to_union(s->ctx, obj1);
 		obj2 = to_union(s->ctx, obj2);
 	}
-	if (obj1.type == isl_obj_set && !isl_set_has_equal_space(obj1.v, obj2.v)) {
+	if (obj1.type == isl_obj_set &&
+            !isl_set_has_equal_space((isl_set*)obj1.v, (isl_set*)obj2.v)) {
 		obj1 = to_union(s->ctx, obj1);
 		obj2 = to_union(s->ctx, obj2);
 	}
 	if (obj1.type == isl_obj_pw_qpolynomial &&
-	    !isl_pw_qpolynomial_has_equal_space(obj1.v, obj2.v)) {
+	    !isl_pw_qpolynomial_has_equal_space((isl_pw_qpolynomial*)obj1.v,
+                                                (isl_pw_qpolynomial*)obj2.v)) {
 		obj1 = to_union(s->ctx, obj1);
 		obj2 = to_union(s->ctx, obj2);
 	}
 	if (obj1.type == isl_obj_pw_qpolynomial_fold &&
-	    !isl_pw_qpolynomial_fold_has_equal_space(obj1.v, obj2.v)) {
+	    !isl_pw_qpolynomial_fold_has_equal_space((isl_pw_qpolynomial_fold*)obj1.v,
+                                                (isl_pw_qpolynomial_fold*)obj2.v)) {
 		obj1 = to_union(s->ctx, obj1);
 		obj2 = to_union(s->ctx, obj2);
 	}
@@ -2744,9 +2750,9 @@ __isl_give isl_map *isl_stream_read_map(__isl_keep isl_stream *s)
 				   obj.type == isl_obj_set, goto error);
 	
 	if (obj.type == isl_obj_set)
-		obj.v = isl_map_from_range(obj.v);
+		obj.v = isl_map_from_range((isl_set*)obj.v);
 
-	return obj.v;
+	return (isl_map*)obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;
@@ -2758,14 +2764,14 @@ __isl_give isl_set *isl_stream_read_set(__isl_keep isl_stream *s)
 
 	obj = obj_read(s);
 	if (obj.v) {
-		if (obj.type == isl_obj_map && isl_map_may_be_set(obj.v)) {
-			obj.v = isl_map_range(obj.v);
+		if (obj.type == isl_obj_map && isl_map_may_be_set((isl_map*)obj.v)) {
+			obj.v = isl_map_range((isl_set*)obj.v);
 			obj.type = isl_obj_set;
 		}
 		isl_assert(s->ctx, obj.type == isl_obj_set, goto error);
 	}
 
-	return obj.v;
+	return (isl_set*) obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;
@@ -2778,19 +2784,19 @@ __isl_give isl_union_map *isl_stream_read_union_map(__isl_keep isl_stream *s)
 	obj = obj_read(s);
 	if (obj.type == isl_obj_map) {
 		obj.type = isl_obj_union_map;
-		obj.v = isl_union_map_from_map(obj.v);
+		obj.v = (struct isl_obj*) isl_union_map_from_map((isl_map*)obj.v);
 	}
 	if (obj.type == isl_obj_set) {
 		obj.type = isl_obj_union_set;
-		obj.v = isl_union_set_from_set(obj.v);
+		obj.v = (struct isl_obj*) isl_union_set_from_set((isl_set*)obj.v);
 	}
 	if (obj.v && obj.type == isl_obj_union_set &&
-	    isl_union_set_is_empty(obj.v))
+	    isl_union_set_is_empty((isl_union_set*)obj.v))
 		obj.type = isl_obj_union_map;
 	if (obj.v && obj.type != isl_obj_union_map)
 		isl_die(s->ctx, isl_error_invalid, "invalid input", goto error);
 
-	return obj.v;
+	return (isl_union_map*)obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;
@@ -2805,12 +2811,12 @@ static __isl_give isl_union_set *extract_union_set(isl_ctx *ctx,
 {
 	if (obj.type == isl_obj_set) {
 		obj.type = isl_obj_union_set;
-		obj.v = isl_union_set_from_set(obj.v);
+		obj.v = isl_union_set_from_set((isl_set*)obj.v);
 	}
 	if (obj.v)
 		isl_assert(ctx, obj.type == isl_obj_union_set, goto error);
 
-	return obj.v;
+	return (isl_union_set*) obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;
@@ -2838,7 +2844,7 @@ static __isl_give isl_basic_map *basic_map_read(__isl_keep isl_stream *s)
 	if (obj.v && (obj.type != isl_obj_map && obj.type != isl_obj_set))
 		isl_die(s->ctx, isl_error_invalid, "not a (basic) set or map",
 			goto error);
-	map = obj.v;
+	map = (isl_map*) obj.v;
 	if (!map)
 		return NULL;
 
@@ -3080,7 +3086,7 @@ __isl_give isl_pw_qpolynomial *isl_stream_read_pw_qpolynomial(
 		isl_assert(s->ctx, obj.type == isl_obj_pw_qpolynomial,
 			   goto error);
 
-	return obj.v;
+	return (isl_pw_qpolynomial*)obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;
@@ -3477,9 +3483,9 @@ __isl_give isl_union_pw_multi_aff *isl_stream_read_union_pw_multi_aff(
 	if (obj.type == isl_obj_map || obj.type == isl_obj_set)
 		obj = to_union(s->ctx, obj);
 	if (obj.type == isl_obj_union_map)
-		return isl_union_pw_multi_aff_from_union_map(obj.v);
+		return isl_union_pw_multi_aff_from_union_map((isl_union_map*)obj.v);
 	if (obj.type == isl_obj_union_set)
-		return isl_union_pw_multi_aff_from_union_set(obj.v);
+		return isl_union_pw_multi_aff_from_union_set((isl_union_set*)obj.v);
 
 	obj.type->free(obj.v);
 	isl_die(s->ctx, isl_error_invalid, "unexpected object type",
@@ -4198,13 +4204,13 @@ __isl_give isl_union_pw_qpolynomial *isl_stream_read_union_pw_qpolynomial(
 	obj = obj_read(s);
 	if (obj.type == isl_obj_pw_qpolynomial) {
 		obj.type = isl_obj_union_pw_qpolynomial;
-		obj.v = isl_union_pw_qpolynomial_from_pw_qpolynomial(obj.v);
+		obj.v = isl_union_pw_qpolynomial_from_pw_qpolynomial((isl_pw_qpolynomial*)obj.v);
 	}
 	if (obj.v)
 		isl_assert(s->ctx, obj.type == isl_obj_union_pw_qpolynomial,
 			   goto error);
 
-	return obj.v;
+	return (isl_union_pw_qpolynomial*)obj.v;
 error:
 	obj.type->free(obj.v);
 	return NULL;

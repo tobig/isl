@@ -8,8 +8,8 @@
 extern "C" {
 #endif
 
-struct isl_external_vertex;
-typedef struct isl_external_vertex	isl_vertex;
+struct isl_vertex;
+typedef struct isl_vertex	isl_vertex;
 
 struct isl_cell;
 typedef struct isl_cell		isl_cell;

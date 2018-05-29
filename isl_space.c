@@ -82,8 +82,8 @@ isl_bool isl_space_is_map(__isl_keep isl_space *space)
 {
 	if (!space)
 		return isl_bool_error;
-	return space->tuple_id[0] != &isl_id_none &&
-		space->tuple_id[1] != &isl_id_none;
+	return (isl_bool)(space->tuple_id[0] != &isl_id_none &&
+		space->tuple_id[1] != &isl_id_none);
 }
 
 __isl_give isl_space *isl_space_set_alloc(isl_ctx *ctx,
@@ -410,7 +410,7 @@ isl_bool isl_space_has_tuple_id(__isl_keep isl_space *dim,
 {
 	if (!space_can_have_id(dim, type))
 		return isl_bool_error;
-	return dim->tuple_id[type - isl_dim_in] != NULL;
+	return (isl_bool)(dim->tuple_id[type - isl_dim_in] != NULL);
 }
 
 __isl_give isl_id *isl_space_get_tuple_id(__isl_keep isl_space *dim,
@@ -542,7 +542,7 @@ isl_bool isl_space_has_dim_id(__isl_keep isl_space *dim,
 {
 	if (!dim)
 		return isl_bool_error;
-	return get_id(dim, type, pos) != NULL;
+	return (isl_bool)(get_id(dim, type, pos) != NULL);
 }
 
 __isl_give isl_id *isl_space_get_dim_id(__isl_keep isl_space *dim,
@@ -587,7 +587,7 @@ isl_bool isl_space_has_tuple_name(__isl_keep isl_space *space,
 	if (!space_can_have_id(space, type))
 		return isl_bool_error;
 	id = space->tuple_id[type - isl_dim_in];
-	return id && id->name;
+	return (isl_bool)(id && id->name);
 }
 
 __isl_keep const char *isl_space_get_tuple_name(__isl_keep isl_space *dim,
@@ -631,7 +631,7 @@ isl_bool isl_space_has_dim_name(__isl_keep isl_space *space,
 	if (!space)
 		return isl_bool_error;
 	id = get_id(space, type, pos);
-	return id && id->name;
+	return (isl_bool)(id && id->name);
 }
 
 __isl_keep const char *isl_space_get_dim_name(__isl_keep isl_space *dim,
@@ -773,10 +773,10 @@ isl_bool isl_space_has_equal_tuples(__isl_keep isl_space *space1,
 		return isl_bool_error;
 	if (space1 == space2)
 		return isl_bool_true;
-	return isl_space_tuple_is_equal(space1, isl_dim_in,
+	return (isl_bool)(isl_space_tuple_is_equal(space1, isl_dim_in,
 					space2, isl_dim_in) &&
 	       isl_space_tuple_is_equal(space1, isl_dim_out,
-					space2, isl_dim_out);
+					space2, isl_dim_out));
 }
 
 /* Check if the tuple of type "type1" of "space1" is the same as
@@ -1052,7 +1052,8 @@ __isl_give isl_space *isl_space_insert_dims(__isl_take isl_space *dim,
 		s[isl_dim_param - o] = dim->nparam;
 		s[isl_dim_in - o] = dim->n_in;
 		s[isl_dim_out - o] = dim->n_out;
-		for (t = isl_dim_param; t <= isl_dim_out; ++t) {
+		for (t = isl_dim_param; t <= isl_dim_out;
+                     t = (enum isl_dim_type) ((int) t + 1)) {
 			if (t != type) {
 				get_ids(dim, t, 0, s[t - o], ids + off);
 				off += s[t - o];
@@ -1130,7 +1131,8 @@ __isl_give isl_space *isl_space_move_dims(__isl_take isl_space *space,
 		s[isl_dim_param - o] = space->nparam;
 		s[isl_dim_in - o] = space->n_in;
 		s[isl_dim_out - o] = space->n_out;
-		for (t = isl_dim_param; t <= isl_dim_out; ++t) {
+		for (t = isl_dim_param; t <= isl_dim_out;
+                     t = (enum isl_dim_type) ((int) t + 1)) {
 			if (t == dst_type) {
 				get_ids(space, t, 0, dst_pos, ids + off);
 				off += dst_pos;
@@ -2119,7 +2121,7 @@ isl_bool isl_space_is_wrapping(__isl_keep isl_space *dim)
 	if (!isl_space_is_set(dim))
 		return isl_bool_false;
 
-	return dim->nested[1] != NULL;
+	return (isl_bool)(dim->nested[1] != NULL);
 }
 
 /* Is "space" the space of a map where the domain is a wrapped map space?
@@ -2132,7 +2134,7 @@ isl_bool isl_space_domain_is_wrapping(__isl_keep isl_space *space)
 	if (isl_space_is_set(space))
 		return isl_bool_false;
 
-	return space->nested[0] != NULL;
+	return (isl_bool)(space->nested[0] != NULL);
 }
 
 /* Is "space" the space of a map where the range is a wrapped map space?
@@ -2145,7 +2147,7 @@ isl_bool isl_space_range_is_wrapping(__isl_keep isl_space *space)
 	if (isl_space_is_set(space))
 		return isl_bool_false;
 
-	return space->nested[1] != NULL;
+	return (isl_bool)(space->nested[1] != NULL);
 }
 
 /* Is "space" a product of two spaces?
@@ -2409,7 +2411,7 @@ isl_bool isl_space_can_curry(__isl_keep isl_space *space)
 	if (!space)
 		return isl_bool_error;
 
-	return !!space->nested[0];
+	return (isl_bool)!!space->nested[0];
 }
 
 /* Given a space (A -> B) -> C, return the corresponding space
@@ -2487,7 +2489,7 @@ isl_bool isl_space_can_uncurry(__isl_keep isl_space *space)
 	if (!space)
 		return isl_bool_error;
 
-	return !!space->nested[1];
+	return (isl_bool)(!!space->nested[1]);
 }
 
 /* Given a space A -> (B -> C), return the corresponding space

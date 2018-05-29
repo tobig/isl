@@ -311,7 +311,7 @@ __isl_give isl_schedule *isl_schedule_reset_user(
 static __isl_give isl_schedule_node *align_params(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	isl_space *space = user;
+	isl_space *space = (isl_space*) user;
 
 	return isl_schedule_node_align_params(node, isl_space_copy(space));
 }
@@ -334,7 +334,7 @@ __isl_give isl_schedule *isl_schedule_align_params(
 static __isl_give isl_schedule_node *pullback_upma(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	isl_union_pw_multi_aff *upma = user;
+	isl_union_pw_multi_aff *upma = (isl_union_pw_multi_aff *) user;
 
 	return isl_schedule_node_pullback_union_pw_multi_aff(node,
 					isl_union_pw_multi_aff_copy(upma));

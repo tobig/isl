@@ -110,11 +110,10 @@ struct isl_args {
 };
 
 #define ISL_ARGS_START(s,name)						\
-	struct isl_arg name ## LIST[];					\
-	struct isl_args name = { sizeof(s), name ## LIST };		\
-	struct isl_arg name ## LIST[] = {
+	struct isl_args name = { sizeof(s), (struct isl_arg[]) \
+	{
 #define ISL_ARGS_END							\
-	{ isl_arg_end } };
+	{ isl_arg_end } } };
 
 #define ISL_ARG_ALIAS(l)	{					\
 	.type = isl_arg_alias,						\
@@ -152,7 +151,7 @@ struct isl_args {
 	.type = isl_arg_choice,						\
 	.short_name = s,						\
 	.long_name = l,							\
-	.offset = -1,							\
+	.offset = (size_t) -1,							\
 	.help_msg = h,							\
 	.flags = fl,							\
 	.u = { .choice = { .choice = c, .default_value = d,		\
@@ -171,7 +170,7 @@ struct isl_args {
 	.type = isl_arg_bool,						\
 	.short_name = s,						\
 	.long_name = l,							\
-	.offset = o,							\
+	.offset = (size_t)o,						\
 	.help_msg = h,							\
 	.flags = fl,							\
 	.u = { .b = { .default_value = d, .set = setter } }		\
@@ -192,7 +191,7 @@ struct isl_args {
 	.offset = offsetof(st, f),					\
 	.help_msg = h,							\
 	.flags = fl,							\
-	.u = { .ul = { .default_value = d } }				\
+	.u = { .ul = { .default_value = (unsigned long) d } }				\
 },
 #define ISL_ARG_INT(st,f,s,l,a,d,h)					\
 	ISL_ARG_INT_F(st,f,s,l,a,d,h,0)

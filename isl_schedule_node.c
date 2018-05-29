@@ -944,7 +944,7 @@ isl_bool isl_schedule_node_has_parent(__isl_keep isl_schedule_node *node)
 	if (!node->ancestors)
 		return isl_bool_error;
 
-	return isl_schedule_tree_list_n_schedule_tree(node->ancestors) != 0;
+	return (isl_bool)(isl_schedule_tree_list_n_schedule_tree(node->ancestors) != 0);
 }
 
 /* Return the position of "node" among the children of its parent.
@@ -984,7 +984,7 @@ isl_bool isl_schedule_node_has_previous_sibling(
 
 	n = isl_schedule_tree_list_n_schedule_tree(node->ancestors);
 
-	return node->child_pos[n - 1] > 0;
+	return (isl_bool)(node->child_pos[n - 1] > 0);
 }
 
 /* Does the parent (if any) of "node" have any children with a greater child
@@ -1009,7 +1009,7 @@ isl_bool isl_schedule_node_has_next_sibling(__isl_keep isl_schedule_node *node)
 	n_child = isl_schedule_tree_list_n_schedule_tree(tree->children);
 	isl_schedule_tree_free(tree);
 
-	return node->child_pos[n - 1] + 1 < n_child;
+	return (isl_bool)(node->child_pos[n - 1] + 1 < n_child);
 }
 
 /* Does "node" have any children?
@@ -1022,7 +1022,7 @@ isl_bool isl_schedule_node_has_children(__isl_keep isl_schedule_node *node)
 {
 	if (!node)
 		return isl_bool_error;
-	return !isl_schedule_tree_is_leaf(node->tree);
+	return (isl_bool)!isl_schedule_tree_is_leaf(node->tree);
 }
 
 /* Return the number of children of "node"?
@@ -1304,7 +1304,8 @@ struct isl_schedule_node_preorder_data {
 static __isl_give isl_schedule_node *preorder_enter(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_schedule_node_preorder_data *data = user;
+	struct isl_schedule_node_preorder_data *data =
+                (struct isl_schedule_node_preorder_data *)user;
 
 	if (!node)
 		return NULL;
@@ -1378,7 +1379,8 @@ struct isl_union_map_every_data {
  */
 static isl_bool call_every(__isl_keep isl_schedule_node *node, void *user)
 {
-	struct isl_union_map_every_data *data = user;
+	struct isl_union_map_every_data *data =
+                (struct isl_union_map_every_data *)user;
 	isl_bool r;
 
 	r = data->test(node, data->user);
@@ -1444,7 +1446,8 @@ static __isl_give isl_schedule_node *postorder_enter(
 static __isl_give isl_schedule_node *postorder_leave(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_schedule_node_postorder_data *data = user;
+	struct isl_schedule_node_postorder_data *data =
+                (struct isl_schedule_node_postorder_data *)user;
 
 	return data->fn(node, data->user);
 }
@@ -3031,7 +3034,8 @@ static __isl_give isl_schedule_tree *group_ancestor(
 	__isl_take isl_schedule_tree *tree, __isl_keep isl_schedule_node *pos,
 	void *user)
 {
-	struct isl_schedule_group_data *data = user;
+	struct isl_schedule_group_data *data =
+                (struct isl_schedule_group_data *)user;
 	isl_union_set *domain;
 	int is_covered;
 
@@ -3377,7 +3381,8 @@ static int gist_done(__isl_keep isl_schedule_node *node,
 static __isl_give isl_schedule_node *gist_enter(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_node_gist_data *data = user;
+	struct isl_node_gist_data *data =
+                (struct isl_node_gist_data *)user;
 
 	do {
 		isl_union_set *filter, *inner;
@@ -3465,7 +3470,8 @@ static __isl_give isl_schedule_node *gist_enter(
 static __isl_give isl_schedule_node *gist_leave(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_node_gist_data *data = user;
+	struct isl_node_gist_data *data =
+                (struct isl_node_gist_data *)user;
 	isl_schedule_tree *tree;
 	int i, n;
 	isl_union_set *filter;
@@ -3656,7 +3662,8 @@ struct isl_subtree_expansion_data {
 static __isl_give isl_schedule_node *subtree_expansion_enter(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_subtree_expansion_data *data = user;
+	struct isl_subtree_expansion_data *data =
+                (struct isl_subtree_expansion_data *)user;
 
 	do {
 		enum isl_schedule_node_type type;
@@ -3723,7 +3730,8 @@ static __isl_give isl_schedule_node *subtree_expansion_enter(
 static __isl_give isl_schedule_node *subtree_expansion_leave(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_subtree_expansion_data *data = user;
+	struct isl_subtree_expansion_data *data =
+                (struct isl_subtree_expansion_data *)user;
 	int n;
 	isl_union_map *inner;
 	enum isl_schedule_node_type type;
@@ -3829,7 +3837,8 @@ struct isl_subtree_contraction_data {
 static __isl_give isl_schedule_node *subtree_contraction_enter(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_subtree_contraction_data *data = user;
+	struct isl_subtree_contraction_data *data =
+                (struct isl_subtree_contraction_data *)user;
 
 	do {
 		enum isl_schedule_node_type type;
@@ -3902,7 +3911,8 @@ static __isl_give isl_schedule_node *subtree_contraction_enter(
 static __isl_give isl_schedule_node *subtree_contraction_leave(
 	__isl_take isl_schedule_node *node, void *user)
 {
-	struct isl_subtree_contraction_data *data = user;
+	struct isl_subtree_contraction_data *data =
+                (struct isl_subtree_contraction_data *)user;
 	int n;
 	isl_union_pw_multi_aff *inner;
 	enum isl_schedule_node_type type;
@@ -4575,7 +4585,8 @@ struct isl_schedule_expand_data {
 static __isl_give isl_schedule_node *expand(__isl_take isl_schedule_node *node,
 	void *user)
 {
-	struct isl_schedule_expand_data *data = user;
+	struct isl_schedule_expand_data *data =
+                  (struct isl_schedule_expand_data *)user;
 	isl_schedule_tree *tree, *leaf;
 	isl_union_set *domain, *left;
 	isl_bool empty;
