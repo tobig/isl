@@ -2694,11 +2694,16 @@ static isl_bool same_divs(__isl_keep isl_basic_map *bmap1,
 		return isl_bool_true;
 
 	known = isl_basic_map_divs_known(bmap1);
-	if (known < 0 || !known)
-		return known;
+	if (known < 0)
+		return isl_bool_error;
+	if (!known)
+		return isl_bool_false;
+
 	known = isl_basic_map_divs_known(bmap2);
-	if (known < 0 || !known)
-		return known;
+	if (known < 0)
+		return isl_bool_error;
+	if (!known)
+		return isl_bool_false;
 
 	total = isl_basic_map_total_dim(bmap1);
 	for (i = 0; i < bmap1->n_div; ++i)
