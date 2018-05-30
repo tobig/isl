@@ -1766,6 +1766,27 @@ enum isl_ai_key {
 	isl_ai_key_end
 };
 
+/* Convert an isl_ai_key to the corresponding isl_access_type. There is no
+ * conversion for isl_ai_key_schedule_map and isl_ai_key_schedule.
+ */
+static enum isl_access_type ai_key_to_access_type(isl_ctx *ctx,
+	enum isl_ai_key key) {
+	switch (key) {
+	case isl_ai_key_sink:
+		return isl_access_sink;
+	case isl_ai_key_must_source:
+		return isl_access_must_source;
+	case isl_ai_key_may_source:
+		return isl_access_may_source;
+	case isl_ai_key_kill:
+		return isl_access_kill;
+	default:
+		isl_die(ctx, isl_error_unknown, "cannot convert isl_ai_key",
+			return isl_access_end);
+	}
+	return isl_access_end;
+}
+
 /* Textual representations of the YAML keys for an isl_union_access_info
  * object.
  */
@@ -1901,7 +1922,8 @@ __isl_give isl_union_access_info *isl_stream_read_union_access_info(
 		case isl_ai_key_may_source:
 		case isl_ai_key_kill:
 			access = read_union_map(s);
-			info = isl_union_access_info_set(info, key, access);
+			info = isl_union_access_info_set(info,
+				ai_key_to_access_type(ctx, key), access);
 			if (!info)
 				return NULL;
 			break;
