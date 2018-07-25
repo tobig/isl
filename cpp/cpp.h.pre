@@ -2,6 +2,7 @@
 #include <isl/ctx.h>
 #include <isl/options.h>
 
+#include <any>
 #include <functional>
 #include <memory>
 #include <stdexcept>

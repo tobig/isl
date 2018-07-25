@@ -61,6 +61,7 @@ protected:
 	bool is_isl_type(QualType type);
 	bool is_isl_bool(QualType type);
 	bool is_isl_stat(QualType type);
+	bool is_any(QualType type);
 	bool is_long(QualType type);
 	bool is_callback(QualType type);
 	bool is_string(QualType type);

@@ -309,6 +309,18 @@ bool generator::is_string(QualType type)
 	return false;
 }
 
+/* Is "type" that of a "void *".
+ */
+bool generator::is_any(QualType type)
+{
+	if (type->isPointerType()) {
+		string s = type->getPointeeType().getAsString();
+		return s == "void";
+	}
+
+	return false;
+}
+
 /* Is "type" that of "long"?
  */
 bool generator::is_long(QualType type)

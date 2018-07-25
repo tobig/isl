@@ -709,6 +709,11 @@ void cpp_generator::print_method_param_use(ostream &os, ParmVarDecl *param,
 		return;
 	}
 
+	if (is_any(type)) {
+		osprintf(os, "new std::any(std::forward<T>(%s))", name_str);
+		return;
+	}
+
 	if (is_string(type)) {
 		osprintf(os, "%s.c_str()", name_str);
 		return;
@@ -950,6 +955,7 @@ void cpp_generator::print_method_impl(ostream &os, const isl_class &clazz,
 	QualType return_type = method->getReturnType();
 	string rettype_str = type2cpp(return_type);
 	bool has_callback = false;
+	bool has_param_any = has_param_of_type_any(method);
 
 	print_method_header(os, clazz, method, fullname, false, kind);
 	osprintf(os, "{\n");
@@ -982,9 +988,21 @@ void cpp_generator::print_method_impl(ostream &os, const isl_class &clazz,
 	}
 	osprintf(os, ");\n");
 
+	if (has_param_any) {
+		osprintf(os, "  auto free_any = [] (void *user) {\n");
+		osprintf(os, "    delete static_cast<std::any*>(user);\n");
+		osprintf(os, "  };\n");
+		osprintf(os, "  res = isl_id_set_free_user(res, free_any);\n");
+	}
+
 	print_exceptional_execution_check(os, method);
 	if (kind == function_kind_constructor) {
 		osprintf(os, "  ptr = res;\n");
+	} else if (is_any(return_type)) {
+		osprintf(os, "  auto any = static_cast<std::any*>(res);\n");
+		osprintf(os, "  if (!any)\n");
+		osprintf(os, "    return nullptr;\n");
+		osprintf(os, "  return std::any_cast<T>(any);\n");
 	} else if (is_isl_type(return_type) ||
 		    (checked &&
 		     (is_isl_bool(return_type) || is_isl_stat(return_type)))) {
@@ -1001,6 +1019,26 @@ void cpp_generator::print_method_impl(ostream &os, const isl_class &clazz,
 	}
 
 	osprintf(os, "}\n");
+}
+
+bool cpp_generator::has_param_of_type_any(FunctionDecl *method) {
+	int first_param = 0;
+	int num_params = method->getNumParams();
+	bool param_type_any = false;
+
+	for (int i = first_param; i < num_params; ++i) {
+		ParmVarDecl *param = method->getParamDecl(i);
+		QualType type = param->getOriginalType();
+
+		if (is_any(type)) {
+			assert(!param_type_any &&
+			       "Only functions with a single 'any' parameter "
+				"supported");
+			param_type_any = true;
+		}
+	}
+
+	return param_type_any;
 }
 
 /* Print the header for "method" in class "clazz" to "os".
@@ -1056,6 +1094,9 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 	int num_params = method->getNumParams();
 	int first_param = 0;
 
+	if (has_param_of_type_any(method) || is_any(method->getReturnType()))
+		osprintf(os, "template <typename T>\n");
+
 	cname = rename_method(cname);
 	if (kind == function_kind_member_method)
 		first_param = 1;
@@ -1076,7 +1117,9 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 		}
 	}
 
-	if (kind != function_kind_constructor)
+	if (is_any(method->getReturnType()))
+		osprintf(os, "%s *", rettype_str.c_str());
+	else if (kind != function_kind_constructor)
 		osprintf(os, "%s ", rettype_str.c_str());
 
 	if (!is_declaration)
@@ -1097,7 +1140,10 @@ void cpp_generator::print_method_header(ostream &os, const isl_class &clazz,
 		if (is_callback(type))
 			num_params--;
 
-		if (keeps(param) || is_string(type) || is_callback(type))
+		if (is_any(type))
+			osprintf(os, "%s &&%s", cpptype.c_str(),
+				 param->getName().str().c_str());
+		else if (keeps(param) || is_string(type) || is_callback(type))
 			osprintf(os, "const %s &%s", cpptype.c_str(),
 				 param->getName().str().c_str());
 		else
@@ -1385,6 +1431,9 @@ string cpp_generator::type2cpp(QualType type)
 
 	if (is_callback(type))
 		return generate_callback_type(type);
+
+	if (is_any(type))
+		return "T";
 
 	die("Cannot convert type to C++ type");
 }
