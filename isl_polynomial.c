@@ -43,12 +43,14 @@ static unsigned pos(__isl_keep isl_space *dim, enum isl_dim_type type)
 	}
 }
 
-int isl_poly_is_cst(__isl_keep isl_poly *poly)
+isl_bool isl_poly_is_cst(__isl_keep isl_poly *poly)
 {
 	if (!poly)
-		return -1;
+		return isl_bool_error;
 
-	return poly->var < 0;
+	if (poly->var < 0)
+		return isl_bool_true;
+	return isl_bool_false;
 }
 
 __isl_keep isl_poly_cst *isl_poly_as_cst(__isl_keep isl_poly *poly)
@@ -80,18 +82,20 @@ static int isl_poly_plain_cmp(__isl_keep isl_poly *poly1,
 	__isl_keep isl_poly *poly2)
 {
 	int i;
+	isl_bool is_cst1;
 	isl_poly_rec *rec1, *rec2;
 
 	if (poly1 == poly2)
 		return 0;
-	if (!poly1)
+	is_cst1 = isl_poly_is_cst(poly1);
+	if (is_cst1 < 0)
 		return -1;
 	if (!poly2)
 		return 1;
 	if (poly1->var != poly2->var)
 		return poly1->var - poly2->var;
 
-	if (isl_poly_is_cst(poly1)) {
+	if (is_cst1) {
 		isl_poly_cst *cst1, *cst2;
 		int cmp;
 
@@ -126,15 +130,17 @@ isl_bool isl_poly_is_equal(__isl_keep isl_poly *poly1,
 	__isl_keep isl_poly *poly2)
 {
 	int i;
+	isl_bool is_cst1;
 	isl_poly_rec *rec1, *rec2;
 
-	if (!poly1 || !poly2)
+	is_cst1 = isl_poly_is_cst(poly1);
+	if (is_cst1 < 0 || !poly2)
 		return isl_bool_error;
 	if (poly1 == poly2)
 		return isl_bool_true;
 	if (poly1->var != poly2->var)
 		return isl_bool_false;
-	if (isl_poly_is_cst(poly1)) {
+	if (is_cst1) {
 		isl_poly_cst *cst1, *cst2;
 		cst1 = isl_poly_as_cst(poly1);
 		cst2 = isl_poly_as_cst(poly2);
@@ -163,12 +169,12 @@ isl_bool isl_poly_is_equal(__isl_keep isl_poly *poly1,
 
 isl_bool isl_poly_is_zero(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -181,11 +187,11 @@ isl_bool isl_poly_is_zero(__isl_keep isl_poly *poly)
 
 int isl_poly_sgn(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return 0;
-	if (!isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
 		return 0;
 
 	cst = isl_poly_as_cst(poly);
@@ -197,12 +203,12 @@ int isl_poly_sgn(__isl_keep isl_poly *poly)
 
 isl_bool isl_poly_is_nan(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -215,12 +221,12 @@ isl_bool isl_poly_is_nan(__isl_keep isl_poly *poly)
 
 isl_bool isl_poly_is_infty(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -233,12 +239,12 @@ isl_bool isl_poly_is_infty(__isl_keep isl_poly *poly)
 
 isl_bool isl_poly_is_neginfty(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -251,12 +257,12 @@ isl_bool isl_poly_is_neginfty(__isl_keep isl_poly *poly)
 
 isl_bool isl_poly_is_one(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -269,12 +275,12 @@ isl_bool isl_poly_is_one(__isl_keep isl_poly *poly)
 
 isl_bool isl_poly_is_negone(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
-	if (!poly)
-		return isl_bool_error;
-	if (!isl_poly_is_cst(poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -636,10 +642,12 @@ error:
 
 __isl_give isl_poly *isl_poly_dup(__isl_keep isl_poly *poly)
 {
-	if (!poly)
-		return NULL;
+	isl_bool is_cst;
 
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return NULL;
+	if (is_cst)
 		return isl_poly_dup_cst(poly);
 	else
 		return isl_poly_dup_rec(poly);
@@ -752,7 +760,7 @@ __isl_give isl_poly *isl_poly_sum(__isl_take isl_poly *poly1,
 	__isl_take isl_poly *poly2)
 {
 	int i;
-	isl_bool is_zero, is_nan;
+	isl_bool is_zero, is_nan, is_cst;
 	isl_poly_rec *rec1, *rec2;
 
 	if (!poly1 || !poly2)
@@ -816,7 +824,10 @@ __isl_give isl_poly *isl_poly_sum(__isl_take isl_poly *poly1,
 		return poly1;
 	}
 
-	if (isl_poly_is_cst(poly1))
+	is_cst = isl_poly_is_cst(poly1);
+	if (is_cst < 0)
+		goto error;
+	if (is_cst)
 		return isl_poly_sum_cst(poly1, poly2);
 
 	rec1 = isl_poly_as_rec(poly1);
@@ -882,12 +893,13 @@ __isl_give isl_poly *isl_poly_cst_add_isl_int(__isl_take isl_poly *poly,
 
 __isl_give isl_poly *isl_poly_add_isl_int(__isl_take isl_poly *poly, isl_int v)
 {
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (!poly)
-		return NULL;
-
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return isl_poly_cst_add_isl_int(poly, v);
 
 	poly = isl_poly_cow(poly);
@@ -931,12 +943,13 @@ __isl_give isl_poly *isl_poly_cst_mul_isl_int(__isl_take isl_poly *poly,
 __isl_give isl_poly *isl_poly_mul_isl_int(__isl_take isl_poly *poly, isl_int v)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (!poly)
-		return NULL;
-
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return isl_poly_cst_mul_isl_int(poly, v);
 
 	poly = isl_poly_cow(poly);
@@ -989,12 +1002,13 @@ static __isl_give isl_poly *isl_poly_scale_val(__isl_take isl_poly *poly,
 	__isl_keep isl_val *v)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (!poly)
-		return NULL;
-
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return isl_poly_cst_scale_val(poly, v);
 
 	poly = isl_poly_cow(poly);
@@ -1096,7 +1110,7 @@ error:
 __isl_give isl_poly *isl_poly_mul(__isl_take isl_poly *poly1,
 	__isl_take isl_poly *poly2)
 {
-	isl_bool is_zero, is_nan, is_one;
+	isl_bool is_zero, is_nan, is_one, is_cst;
 
 	if (!poly1 || !poly2)
 		goto error;
@@ -1183,7 +1197,10 @@ __isl_give isl_poly *isl_poly_mul(__isl_take isl_poly *poly1,
 		return poly1;
 	}
 
-	if (isl_poly_is_cst(poly1))
+	is_cst = isl_poly_is_cst(poly1);
+	if (is_cst < 0)
+		goto error;
+	if (is_cst)
 		return isl_poly_mul_cst(poly1, poly2);
 
 	return isl_poly_mul_rec(poly1, poly2);
@@ -1340,11 +1357,15 @@ error:
 static __isl_give isl_poly *reorder(__isl_take isl_poly *poly, int *r)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 	isl_poly *base;
 	isl_poly *res;
 
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return poly;
 
 	rec = isl_poly_as_rec(poly);
@@ -1513,9 +1534,13 @@ static __isl_give isl_poly *expand(__isl_take isl_poly *poly, int *exp,
 	int first)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return poly;
 
 	if (poly->var < first)
@@ -1908,13 +1933,15 @@ __isl_give isl_qpolynomial *isl_qpolynomial_cst_on_domain(
 isl_bool isl_qpolynomial_is_cst(__isl_keep isl_qpolynomial *qp,
 	isl_int *n, isl_int *d)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
 	if (!qp)
 		return isl_bool_error;
 
-	if (!isl_poly_is_cst(qp->poly))
-		return isl_bool_false;
+	is_cst = isl_poly_is_cst(qp->poly);
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	cst = isl_poly_as_cst(qp->poly);
 	if (!cst)
@@ -1932,12 +1959,13 @@ isl_bool isl_qpolynomial_is_cst(__isl_keep isl_qpolynomial *qp,
  */
 static __isl_give isl_val *isl_poly_get_constant_val(__isl_keep isl_poly *poly)
 {
+	isl_bool is_cst;
 	isl_poly_cst *cst;
 
 	if (!poly)
 		return NULL;
 
-	while (!isl_poly_is_cst(poly)) {
+	while ((is_cst = isl_poly_is_cst(poly)) == isl_bool_false) {
 		isl_poly_rec *rec;
 
 		rec = isl_poly_as_rec(poly);
@@ -1945,6 +1973,8 @@ static __isl_give isl_val *isl_poly_get_constant_val(__isl_keep isl_poly *poly)
 			return NULL;
 		poly = rec->p[0];
 	}
+	if (is_cst < 0)
+		return NULL;
 
 	cst = isl_poly_as_cst(poly);
 	if (!cst)
@@ -1965,7 +1995,7 @@ __isl_give isl_val *isl_qpolynomial_get_constant_val(
 
 isl_bool isl_poly_is_affine(__isl_keep isl_poly *poly)
 {
-	int is_cst;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
 	if (!poly)
@@ -1984,10 +2014,8 @@ isl_bool isl_poly_is_affine(__isl_keep isl_poly *poly)
 	isl_assert(poly->ctx, rec->n > 1, return isl_bool_error);
 
 	is_cst = isl_poly_is_cst(rec->p[1]);
-	if (is_cst < 0)
-		return isl_bool_error;
-	if (!is_cst)
-		return isl_bool_false;
+	if (is_cst < 0 || !is_cst)
+		return is_cst;
 
 	return isl_poly_is_affine(rec->p[0]);
 }
@@ -2137,9 +2165,13 @@ isl_bool isl_qpolynomial_plain_is_equal(__isl_keep isl_qpolynomial *qp1,
 static isl_stat poly_update_den(__isl_keep isl_poly *poly, isl_int *d)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (isl_poly_is_cst(poly)) {
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_stat_error;
+	if (is_cst) {
 		isl_poly_cst *cst;
 		cst = isl_poly_as_cst(poly);
 		if (!cst)
@@ -2207,13 +2239,14 @@ __isl_give isl_poly *isl_poly_subs(__isl_take isl_poly *poly,
 	unsigned first, unsigned n, __isl_keep isl_poly **subs)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 	isl_poly *base, *res;
 
-	if (!poly)
-		return NULL;
-
-	if (isl_poly_is_cst(poly))
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst)
 		return poly;
 
 	if (poly->var < first)
@@ -2572,13 +2605,14 @@ error:
 
 static isl_stat poly_set_active(__isl_keep isl_poly *poly, int *active, int d)
 {
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 	int i;
 
-	if (!poly)
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
 		return isl_stat_error;
-
-	if (isl_poly_is_cst(poly))
+	if (is_cst)
 		return isl_stat_ok;
 
 	if (poly->var < d)
@@ -3107,11 +3141,15 @@ __isl_give isl_val *isl_poly_eval(__isl_take isl_poly *poly,
 	__isl_take isl_vec *vec)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 	isl_val *res;
 	isl_val *base;
 
-	if (isl_poly_is_cst(poly)) {
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		goto error;
+	if (is_cst) {
 		isl_vec_free(vec);
 		res = isl_poly_get_constant_val(poly);
 		isl_poly_free(poly);
@@ -3552,7 +3590,7 @@ int isl_poly_degree(__isl_keep isl_poly *poly, int first, int last)
 {
 	int deg = -1;
 	int i;
-	isl_bool is_zero;
+	isl_bool is_zero, is_cst;
 	isl_poly_rec *rec;
 
 	is_zero = isl_poly_is_zero(poly);
@@ -3560,7 +3598,10 @@ int isl_poly_degree(__isl_keep isl_poly *poly, int first, int last)
 		return -2;
 	if (is_zero)
 		return -1;
-	if (isl_poly_is_cst(poly) || poly->var < first)
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return -2;
+	if (is_cst || poly->var < first)
 		return 0;
 
 	rec = isl_poly_as_rec(poly);
@@ -3604,12 +3645,13 @@ __isl_give isl_poly *isl_poly_coeff(__isl_keep isl_poly *poly,
 	unsigned pos, int deg)
 {
 	int i;
+	isl_bool is_cst;
 	isl_poly_rec *rec;
 
-	if (!poly)
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
 		return NULL;
-
-	if (isl_poly_is_cst(poly) || poly->var < pos) {
+	if (is_cst || poly->var < pos) {
 		if (deg == 0)
 			return isl_poly_copy(poly);
 		else
@@ -3694,7 +3736,7 @@ __isl_give isl_poly *isl_poly_homogenize(__isl_take isl_poly *poly, int deg,
 	int target, int first, int last)
 {
 	int i;
-	isl_bool is_zero;
+	isl_bool is_zero, is_cst;
 	isl_poly_rec *rec;
 
 	is_zero = isl_poly_is_zero(poly);
@@ -3704,7 +3746,10 @@ __isl_give isl_poly *isl_poly_homogenize(__isl_take isl_poly *poly, int deg,
 		return poly;
 	if (deg == target)
 		return poly;
-	if (isl_poly_is_cst(poly) || poly->var < first) {
+	is_cst = isl_poly_is_cst(poly);
+	if (is_cst < 0)
+		return isl_poly_free(poly);
+	if (is_cst || poly->var < first) {
 		isl_poly *hom;
 
 		hom = isl_poly_var_pow(poly->ctx, first, target - deg);
@@ -3944,7 +3989,7 @@ __isl_give isl_term *isl_poly_foreach_term(__isl_keep isl_poly *poly,
 	__isl_take isl_term *term, void *user)
 {
 	int i;
-	isl_bool is_zero, is_bad;
+	isl_bool is_zero, is_bad, is_cst;
 	isl_poly_rec *rec;
 
 	is_zero = isl_poly_is_zero(poly);
@@ -3954,19 +3999,20 @@ __isl_give isl_term *isl_poly_foreach_term(__isl_keep isl_poly *poly,
 	if (is_zero)
 		return term;
 
+	is_cst = isl_poly_is_cst(poly);
 	is_bad = isl_poly_is_nan(poly);
 	if (is_bad >= 0 && !is_bad)
 		is_bad = isl_poly_is_infty(poly);
 	if (is_bad >= 0 && !is_bad)
 		is_bad = isl_poly_is_neginfty(poly);
-	if (is_bad < 0)
+	if (is_cst < 0 || is_bad < 0)
 		return isl_term_free(term);
 	if (is_bad)
 		isl_die(isl_term_get_ctx(term), isl_error_invalid,
 			"cannot handle NaN/infty polynomial",
 			return isl_term_free(term));
 
-	if (isl_poly_is_cst(poly)) {
+	if (is_cst) {
 		isl_poly_cst *cst;
 		cst = isl_poly_as_cst(poly);
 		if (!cst)
@@ -4190,11 +4236,15 @@ __isl_give isl_val *isl_qpolynomial_opt_on_domain(
 	__isl_take isl_qpolynomial *qp, __isl_take isl_set *set, int max)
 {
 	struct isl_opt_data data = { NULL, 1, NULL, max };
+	isl_bool is_cst;
 
 	if (!set || !qp)
 		goto error;
 
-	if (isl_poly_is_cst(qp->poly)) {
+	is_cst = isl_poly_is_cst(qp->poly);
+	if (is_cst < 0)
+		goto error;
+	if (is_cst) {
 		isl_set_free(set);
 		data.opt = isl_qpolynomial_get_constant_val(qp);
 		isl_qpolynomial_free(qp);
