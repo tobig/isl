@@ -111,11 +111,10 @@ struct isl_args {
 };
 
 #define ISL_ARGS_START(s,name)						\
-	struct isl_arg name ## LIST[];					\
-	struct isl_args name = { sizeof(s), name ## LIST };		\
-	struct isl_arg name ## LIST[] = {
+	struct isl_args name = { sizeof(s), (struct isl_arg[])		\
+	{
 #define ISL_ARGS_END							\
-	{ isl_arg_end } };
+	{ isl_arg_end } } };
 
 #define ISL_ARG_ALIAS(l)	{					\
 	.type = isl_arg_alias,						\
