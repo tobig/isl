@@ -2237,7 +2237,7 @@ static __isl_give isl_ast_graft_list *generate_parallel_domains(
  */
 struct isl_separate_domain_data {
 	isl_ast_build *build;
-	int explicit;
+	int explicit_bounds;
 	isl_set *domain;
 };
 
@@ -2301,7 +2301,7 @@ static isl_stat separate_domain(__isl_take isl_map *map, void *user)
 	isl_set *domain;
 	isl_set *d1, *d2;
 
-	if (data->explicit)
+	if (data->explicit_bounds)
 		domain = explicit_bounds(map, data->build);
 	else
 		domain = implicit_bounds(map, data->build);
@@ -2333,8 +2333,9 @@ static __isl_give isl_set *separate_schedule_domains(
 	isl_ctx *ctx;
 
 	ctx = isl_ast_build_get_ctx(build);
-	data.explicit = isl_options_get_ast_build_separation_bounds(ctx) ==
-				    ISL_AST_BUILD_SEPARATION_BOUNDS_EXPLICIT;
+	data.explicit_bounds =
+		isl_options_get_ast_build_separation_bounds(ctx) ==
+			ISL_AST_BUILD_SEPARATION_BOUNDS_EXPLICIT;
 	data.domain = isl_set_empty(space);
 	if (isl_union_map_foreach_map(executed, &separate_domain, &data) < 0)
 		data.domain = isl_set_free(data.domain);
