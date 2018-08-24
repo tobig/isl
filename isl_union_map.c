@@ -4244,7 +4244,7 @@ struct isl_union_map_remove_map_if_data {
 /* isl_un_op_control filter that negates the result of data->fn
  * called on "map".
  */
-static isl_bool not(__isl_keep isl_map *map, void *user)
+static isl_bool not_filter(__isl_keep isl_map *map, void *user)
 {
 	struct isl_union_map_remove_map_if_data *data = user;
 
@@ -4271,7 +4271,7 @@ __isl_give isl_union_map *isl_union_map_remove_map_if(
 {
 	struct isl_union_map_remove_map_if_data data = { fn, user };
 	struct isl_un_op_control control = {
-		.filter = &not,
+		.filter = &not_filter,
 		.filter_user = &data,
 		.fn_map = &map_id,
 	};
