@@ -1651,6 +1651,35 @@ error:
 	return NULL;
 }
 
+static __isl_give isl_map *read_forall(__isl_keep isl_stream *s,
+	struct vars *v, __isl_take isl_map *map, int rational)
+{
+	isl_map *res;
+
+	int n = v->n;
+	int seen_paren = isl_stream_eat_if_available(s, '(');
+
+	res = isl_map_from_domain(isl_map_wrap(isl_map_copy(map)));
+	res = read_defined_var_list(s, v, res, rational);
+
+	if (isl_stream_eat(s, ':'))
+		goto error;
+
+	res = read_formula(s, v, res, rational);
+	res = isl_map_complement(res);
+	res = isl_set_unwrap(isl_map_domain(res));
+	map = isl_map_subtract(map, res);
+
+	vars_drop(v, v->n - n);
+	if (seen_paren && isl_stream_eat(s, ')'))
+		goto error;
+
+	return map;
+error:
+	isl_map_free(map);
+	return NULL;
+}
+
 /* Parse an expression between parentheses and push the result
  * back on the stream.
  *
@@ -1682,6 +1711,7 @@ static int resolve_paren_expr(__isl_keep isl_stream *s,
 			goto error;
 
 	if (isl_stream_next_token_is(s, ISL_TOKEN_EXISTS) ||
+	    isl_stream_next_token_is(s, ISL_TOKEN_FORALL) ||
 	    isl_stream_next_token_is(s, ISL_TOKEN_NOT) ||
 	    isl_stream_next_token_is(s, ISL_TOKEN_TRUE) ||
 	    isl_stream_next_token_is(s, ISL_TOKEN_FALSE) ||
@@ -1758,6 +1788,9 @@ static __isl_give isl_map *read_conjunct(__isl_keep isl_stream *s,
 
 	if (isl_stream_eat_if_available(s, ISL_TOKEN_EXISTS))
 		return read_exists(s, v, map, rational);
+
+	if (isl_stream_eat_if_available(s, ISL_TOKEN_FORALL))
+		return read_forall(s, v, map, rational);
 
 	if (isl_stream_eat_if_available(s, ISL_TOKEN_TRUE))
 		return map;

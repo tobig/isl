@@ -304,6 +304,8 @@ static enum isl_token_type check_keywords(__isl_keep isl_stream *s)
 
 	if (!strcasecmp(s->buffer, "exists"))
 		return ISL_TOKEN_EXISTS;
+	if (!strcasecmp(s->buffer, "forall"))
+		return ISL_TOKEN_FORALL;
 	if (!strcasecmp(s->buffer, "and"))
 		return ISL_TOKEN_AND;
 	if (!strcasecmp(s->buffer, "or"))
