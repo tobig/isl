@@ -471,10 +471,8 @@ __isl_give isl_space *isl_space_reset_tuple_id(__isl_take isl_space *space,
 	space = isl_space_cow(space);
 	if (!space)
 		return NULL;
-	if (type != isl_dim_in && type != isl_dim_out)
-		isl_die(space->ctx, isl_error_invalid,
-			"only input, output and set tuples can have names",
-			goto error);
+	if (!space_can_have_id(space, type))
+		goto error;
 
 	isl_id_free(space->tuple_id[type - isl_dim_in]);
 	space->tuple_id[type - isl_dim_in] = NULL;
