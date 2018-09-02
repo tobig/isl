@@ -226,7 +226,9 @@ isl_bool isl_poly_is_infty(__isl_keep isl_poly *poly)
 	if (!cst)
 		return isl_bool_error;
 
-	return isl_int_is_pos(cst->n) && isl_int_is_zero(cst->d);
+	if (isl_int_is_pos(cst->n) && isl_int_is_zero(cst->d))
+		return isl_bool_true;
+	return isl_bool_false;
 }
 
 isl_bool isl_poly_is_neginfty(__isl_keep isl_poly *poly)
@@ -242,7 +244,9 @@ isl_bool isl_poly_is_neginfty(__isl_keep isl_poly *poly)
 	if (!cst)
 		return isl_bool_error;
 
-	return isl_int_is_neg(cst->n) && isl_int_is_zero(cst->d);
+	if (isl_int_is_neg(cst->n) && isl_int_is_zero(cst->d))
+		return isl_bool_true;
+	return isl_bool_false;
 }
 
 int isl_poly_is_one(__isl_keep isl_poly *poly)
