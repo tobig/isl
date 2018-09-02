@@ -485,8 +485,10 @@ static isl_bool next_is_opposite(__isl_keep isl_basic_map *bmap, int i,
 		if (is_div)
 			return isl_bool_false;
 	}
-	return isl_int_abs_eq(bmap->ineq[i][last], bmap->ineq[i + 1][last]) &&
-		!isl_int_eq(bmap->ineq[i][last], bmap->ineq[i + 1][last]);
+	if (isl_int_abs_eq(bmap->ineq[i][last], bmap->ineq[i + 1][last]) &&
+		!isl_int_eq(bmap->ineq[i][last], bmap->ineq[i + 1][last]))
+		return isl_bool_true;
+	return isl_bool_false;
 }
 
 /* Return a string representation of the operator used when
