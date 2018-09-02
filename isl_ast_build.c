@@ -570,7 +570,9 @@ isl_bool isl_ast_build_need_schedule_map(__isl_keep isl_ast_build *build)
 		return isl_bool_error;
 
 	dim = isl_ast_build_dim(build, isl_dim_set);
-	return build->depth != dim || any_eliminated(build);
+	if (build->depth != dim || any_eliminated(build))
+		isl_bool_true;
+	return isl_bool_false;
 }
 
 /* Return a mapping from the internal schedule space to the external
