@@ -150,7 +150,7 @@ static isl_bool uset_is_bound(__isl_keep isl_set *set, isl_int *c, unsigned len)
 	}
 	isl_int_clear(opt);
 	isl_int_clear(opt_denom);
-	return j >= set->n;
+	return j >= set->n ? isl_bool_true : isl_bool_false;
 error:
 	isl_int_clear(opt);
 	isl_int_clear(opt_denom);
