@@ -1283,7 +1283,7 @@ static isl_bool incremental_on_entire_domain(__isl_keep isl_space *space,
 
 	isl_set_free(C);
 
-	return *res != NULL;
+	return *res != NULL ? isl_bool_true : isl_bool_false;
 error:
 	isl_set_free(C);
 	return isl_bool_error;
