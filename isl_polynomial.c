@@ -1971,7 +1971,7 @@ isl_bool isl_poly_is_affine(__isl_keep isl_poly *poly)
 	if (rec->n > 2)
 		return isl_bool_false;
 
-	isl_assert(poly->ctx, rec->n > 1, return -1);
+	isl_assert(poly->ctx, rec->n > 1, return isl_bool_error);
 
 	is_cst = isl_poly_is_cst(rec->p[1]);
 	if (is_cst < 0)
