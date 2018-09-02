@@ -245,7 +245,7 @@ static isl_bool is_independent(__isl_keep isl_mat *facets, int n, isl_int *f)
 	if (rank < 0)
 		return isl_bool_error;
 
-	return rank == n + 1;
+	return rank == n + 1 ? isl_bool_true : isl_bool_false;
 }
 
 /* Check whether we can select constraint "level", given the current selection
