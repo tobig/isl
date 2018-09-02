@@ -4426,7 +4426,7 @@ static isl_bool after_in_set(__isl_keep isl_union_map *umap,
 	n = isl_schedule_node_n_children(node);
 	for (i = 0; i < n; ++i) {
 		isl_schedule_node *child;
-		int after;
+		isl_bool after;
 
 		child = isl_schedule_node_get_child(node, i);
 		after = after_in_tree(umap, child);
