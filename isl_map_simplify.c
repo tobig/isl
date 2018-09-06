@@ -3992,7 +3992,7 @@ static isl_bool is_opposite(__isl_keep isl_basic_map *bmap, int i, int j)
 	total = isl_basic_map_dim(bmap, isl_dim_all);
 	if (total < 0)
 		return isl_bool_error;
-	return is_opposite_part(bmap, i, j, 1, total);
+	return isl_bool_ok(is_opposite_part(bmap, i, j, 1, total));
 }
 
 /* Check if we can combine a given div with lower bound l and upper
