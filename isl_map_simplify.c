@@ -4525,12 +4525,14 @@ static isl_bool is_parallel_except(__isl_keep isl_basic_map *bmap, int i, int j,
 	int pos)
 {
 	isl_size total;
+	int r;
 
 	total = isl_basic_map_dim(bmap, isl_dim_all);
 	if (total < 0)
 		return isl_bool_error;
-	return is_parallel_part(bmap, i, j, 1, pos - 1) &&
-		is_parallel_part(bmap, i, j, pos + 1, total - pos);
+	r = is_parallel_part(bmap, i, j, 1, pos - 1) &&
+	    is_parallel_part(bmap, i, j, pos + 1, total - pos);
+	return isl_bool_ok(r);
 }
 
 /* Are inequality constraints "i" and "j" of "bmap" opposite to each other,
