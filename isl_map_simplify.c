@@ -160,8 +160,9 @@ static isl_bool needs_reduction(__isl_keep isl_basic_map *bmap, int div,
 		return isl_bool_false;
 
 	isl_int_mul_ui(bmap->div[div][1 + pos], bmap->div[div][1 + pos], 2);
-	r = isl_int_abs_ge(bmap->div[div][1 + pos], bmap->div[div][0]) &&
-	    !isl_int_eq(bmap->div[div][1 + pos], bmap->div[div][0]);
+	r = isl_bool_ok(
+		isl_int_abs_ge(bmap->div[div][1 + pos], bmap->div[div][0]) &&
+		!isl_int_eq(bmap->div[div][1 + pos], bmap->div[div][0]));
 	isl_int_divexact_ui(bmap->div[div][1 + pos],
 			    bmap->div[div][1 + pos], 2);
 
