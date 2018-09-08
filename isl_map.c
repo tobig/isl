@@ -965,7 +965,7 @@ isl_bool isl_basic_map_is_rational(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return ISL_F_ISSET(bmap, ISL_BASIC_MAP_RATIONAL);
+	return isl_bool_ok(ISL_F_ISSET(bmap, ISL_BASIC_MAP_RATIONAL));
 }
 
 /* Has "map" been marked as a rational map?
