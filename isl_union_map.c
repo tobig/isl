@@ -2619,7 +2619,7 @@ isl_bool isl_union_map_plain_is_empty(__isl_keep isl_union_map *umap)
 	n = isl_union_map_n_map(umap);
 	if (n < 0)
 		return isl_bool_error;
-	return n == 0;
+	return isl_bool_ok(n == 0);
 }
 
 isl_bool isl_union_map_is_empty(__isl_keep isl_union_map *umap)
