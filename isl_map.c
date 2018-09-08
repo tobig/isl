@@ -9844,7 +9844,7 @@ isl_bool isl_map_plain_is_equal(__isl_keep isl_map *map1,
 	map2 = isl_map_normalize(map2);
 	if (!map1 || !map2)
 		goto error;
-	equal = map1->n == map2->n;
+	equal = isl_bool_ok(map1->n == map2->n);
 	for (i = 0; equal && i < map1->n; ++i) {
 		equal = isl_basic_map_plain_is_equal(map1->p[i], map2->p[i]);
 		if (equal < 0)
