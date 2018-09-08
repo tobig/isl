@@ -8516,7 +8516,7 @@ isl_bool isl_map_plain_is_empty(__isl_keep isl_map *map)
 
 isl_bool isl_set_plain_is_empty(__isl_keep isl_set *set)
 {
-	return set ? set->n == 0 : isl_bool_error;
+	return set ? isl_bool_ok(set->n == 0) : isl_bool_error;
 }
 
 isl_bool isl_set_is_empty(__isl_keep isl_set *set)
