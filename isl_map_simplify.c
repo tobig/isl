@@ -1182,7 +1182,7 @@ static isl_bool better_div_constraint(__isl_keep isl_basic_map *bmap,
 	last_div = isl_seq_last_non_zero(bmap->div[div] + 1,
 					 total + bmap->n_div);
 
-	return last_ineq < last_div;
+	return isl_bool_ok(last_ineq < last_div);
 }
 
 /* Given two constraints "k" and "l" that are opposite to each other,
