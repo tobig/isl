@@ -3037,7 +3037,7 @@ static isl_bool plain_injective_on_range(__isl_take isl_union_map *umap,
 		dim = isl_union_map_get_space(umap);
 		injective = separates(data.v, n, dim, data.pos, n_range);
 		isl_union_map_free(umap);
-		return injective;
+		return isl_bool_ok(injective);
 	}
 
 	free_isl_fixed_map_array(data.v, n);
