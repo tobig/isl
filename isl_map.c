@@ -8758,7 +8758,7 @@ isl_bool isl_basic_set_plain_is_empty(__isl_keep isl_basic_set *bset)
 {
 	if (!bset)
 		return isl_bool_error;
-	return ISL_F_ISSET(bset, ISL_BASIC_SET_EMPTY);
+	return isl_bool_ok(ISL_F_ISSET(bset, ISL_BASIC_SET_EMPTY));
 }
 
 /* Is "bmap" known to be non-empty?
