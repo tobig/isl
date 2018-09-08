@@ -7566,7 +7566,7 @@ isl_bool isl_basic_map_divs_known(__isl_keep isl_basic_map *bmap)
 	first = isl_basic_map_first_unknown_div(bmap);
 	if (n < 0 || first < 0)
 		return isl_bool_error;
-	return first == n;
+	return isl_bool_ok(first == n);
 }
 
 /* Do all basic maps in "map" have an explicit representation
