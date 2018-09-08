@@ -682,7 +682,7 @@ isl_bool isl_union_map_contains(__isl_keep isl_union_map *umap,
 	hash = isl_space_get_hash(space);
 	entry = isl_hash_table_find(umap->dim->ctx, &umap->table, hash,
 				    &has_space, space, 0);
-	return !!entry;
+	return isl_bool_ok(entry);
 }
 
 isl_bool isl_union_set_contains(__isl_keep isl_union_set *uset,
