@@ -4240,7 +4240,7 @@ static isl_bool int_between_bounds(__isl_keep isl_basic_map *bmap, int i,
 
 	isl_seq_gcd(data->v->el + 1, offset - 1 + n_div, &data->g);
 	if (isl_int_is_zero(data->g))
-		return isl_int_is_nonneg(data->fl);
+		return isl_bool_ok(isl_int_is_nonneg(data->fl));
 	if (isl_int_is_one(data->g)) {
 		isl_int_set(data->v->el[0], data->fl);
 		return test_ineq_is_satisfied(bmap, data);
