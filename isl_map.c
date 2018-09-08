@@ -8462,7 +8462,7 @@ isl_bool isl_basic_map_is_subset(__isl_keep isl_basic_map *bmap1,
 	isl_map_free(map1);
 	isl_map_free(map2);
 
-	return is_subset;
+	return isl_bool_ok(is_subset);
 }
 
 isl_bool isl_basic_set_is_subset(__isl_keep isl_basic_set *bset1,
