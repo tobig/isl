@@ -154,7 +154,7 @@ static __isl_give isl_basic_map *reduce_coefficient_in_div(
 static isl_bool needs_reduction(__isl_keep isl_basic_map *bmap, int div,
 	int pos)
 {
-	isl_bool r;
+	int r;
 
 	if (isl_int_is_zero(bmap->div[div][1 + pos]))
 		return isl_bool_false;
@@ -165,7 +165,7 @@ static isl_bool needs_reduction(__isl_keep isl_basic_map *bmap, int div,
 	isl_int_divexact_ui(bmap->div[div][1 + pos],
 			    bmap->div[div][1 + pos], 2);
 
-	return r;
+	return isl_bool_ok(r);
 }
 
 /* Reduce the coefficients (including the constant term) of
