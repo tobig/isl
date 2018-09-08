@@ -786,14 +786,24 @@ static __isl_keep isl_space *nested(__isl_keep isl_space *dim,
 isl_bool isl_space_has_equal_tuples(__isl_keep isl_space *space1,
 	__isl_keep isl_space *space2)
 {
+	isl_bool equal_in, equal_out;
+
 	if (!space1 || !space2)
 		return isl_bool_error;
 	if (space1 == space2)
 		return isl_bool_true;
-	return isl_space_tuple_is_equal(space1, isl_dim_in,
-					space2, isl_dim_in) &&
-	       isl_space_tuple_is_equal(space1, isl_dim_out,
-					space2, isl_dim_out);
+
+	equal_in = isl_space_tuple_is_equal(space1, isl_dim_in, space2,
+					    isl_dim_in);
+	if (equal_in < 0 || !equal_in)
+		return equal_in;
+
+	equal_out = isl_space_tuple_is_equal(space1, isl_dim_out, space2,
+					     isl_dim_out);
+	if (equal_out < 0 || !equal_out)
+		return equal_out;
+
+	return isl_bool_true;
 }
 
 /* Check if the tuple of type "type1" of "space1" is the same as
