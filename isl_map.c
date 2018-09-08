@@ -8738,7 +8738,7 @@ isl_bool isl_basic_map_is_empty(__isl_keep isl_basic_map *bmap)
 	sample = isl_basic_set_sample_vec(bset);
 	if (!sample)
 		return isl_bool_error;
-	empty = sample->size == 0;
+	empty = isl_bool_ok(sample->size == 0);
 	isl_vec_free(bmap->sample);
 	bmap->sample = sample;
 	if (empty)
