@@ -13605,13 +13605,13 @@ static isl_bool is_internal(__isl_keep isl_vec *inner,
 	isl_seq_inner_product(inner->el, bset->ineq[ineq], inner->size,
 				&ctx->normalize_gcd);
 	if (!isl_int_is_zero(ctx->normalize_gcd))
-		return isl_int_is_nonneg(ctx->normalize_gcd);
+		return isl_bool_ok(isl_int_is_nonneg(ctx->normalize_gcd));
 
 	total = isl_basic_set_dim(bset, isl_dim_all);
 	if (total < 0)
 		return isl_bool_error;
 	pos = isl_seq_first_non_zero(bset->ineq[ineq] + 1, total);
-	return isl_int_is_pos(bset->ineq[ineq][1 + pos]);
+	return isl_bool_ok(isl_int_is_pos(bset->ineq[ineq][1 + pos]));
 }
 
 /* Tighten the inequality constraints of "bset" that are outward with respect
