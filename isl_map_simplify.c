@@ -4158,7 +4158,7 @@ static isl_bool test_ineq_is_satisfied(__isl_keep isl_basic_map *bmap,
 	res = isl_tab_min(data->tab, data->v->el, ctx->one, &data->g, NULL, 0);
 	if (res == isl_lp_error)
 		return isl_bool_error;
-	return res == isl_lp_ok && isl_int_is_nonneg(data->g);
+	return isl_bool_ok(res == isl_lp_ok && isl_int_is_nonneg(data->g));
 }
 
 /* Given a lower and an upper bound on div i, do they always allow
