@@ -739,7 +739,7 @@ isl_bool isl_basic_map_plain_is_singleton(__isl_keep isl_basic_map *bmap)
 	total = isl_basic_map_dim(bmap, isl_dim_all);
 	if (total < 0)
 		return isl_bool_error;
-	return bmap->n_eq == total;
+	return isl_bool_ok(bmap->n_eq == total);
 }
 
 /* Return true if "map" contains a single element.
