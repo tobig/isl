@@ -9711,7 +9711,7 @@ isl_bool isl_basic_map_plain_is_equal(__isl_keep isl_basic_map *bmap1,
 {
 	if (!bmap1 || !bmap2)
 		return isl_bool_error;
-	return isl_basic_map_plain_cmp(bmap1, bmap2) == 0;
+	return isl_bool_ok(isl_basic_map_plain_cmp(bmap1, bmap2) == 0);
 }
 
 isl_bool isl_basic_set_plain_is_equal(__isl_keep isl_basic_set *bset1,
