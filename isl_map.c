@@ -7521,7 +7521,7 @@ isl_bool isl_basic_map_div_is_marked_unknown(__isl_keep isl_basic_map *bmap,
 {
 	if (isl_basic_map_check_range(bmap, isl_dim_div, div, 1) < 0)
 		return isl_bool_error;
-	return isl_int_is_zero(bmap->div[div][0]);
+	return isl_bool_ok(isl_int_is_zero(bmap->div[div][0]));
 }
 
 /* Return the position of the first local variable that does not
