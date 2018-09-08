@@ -10744,7 +10744,7 @@ static isl_bool basic_map_dim_is_bounded(__isl_keep isl_basic_map *bmap,
 			upper = 1;
 	}
 
-	return lower && upper;
+	return isl_bool_ok(lower && upper);
 }
 
 isl_bool isl_basic_map_dim_is_bounded(__isl_keep isl_basic_map *bmap,
