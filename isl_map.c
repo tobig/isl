@@ -8751,7 +8751,7 @@ isl_bool isl_basic_map_plain_is_empty(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return ISL_F_ISSET(bmap, ISL_BASIC_MAP_EMPTY);
+	return isl_bool_ok(ISL_F_ISSET(bmap, ISL_BASIC_MAP_EMPTY));
 }
 
 isl_bool isl_basic_set_plain_is_empty(__isl_keep isl_basic_set *bset)
