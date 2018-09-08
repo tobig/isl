@@ -859,7 +859,7 @@ static __isl_keep isl_maybe_isl_map bin_try_get_match(
 				     &data->umap2->table, hash,
 				     &has_space, space, 0);
 	isl_space_free(space);
-	res.valid = entry2 != NULL;
+	res.valid = isl_bool_ok(entry2 != NULL);
 	if (entry2)
 		res.value = entry2->data;
 
