@@ -13535,8 +13535,8 @@ isl_bool isl_basic_map_equal_div_expr_part(__isl_keep isl_basic_map *bmap1,
 		return isl_bool_error;
 	if (isl_basic_map_check_range(bmap2, isl_dim_div, pos2, 1) < 0)
 		return isl_bool_error;
-	return isl_seq_eq(bmap1->div[pos1] + first,
-			  bmap2->div[pos2] + first, n);
+	return isl_bool_ok(isl_seq_eq(bmap1->div[pos1] + first,
+			  bmap2->div[pos2] + first, n));
 }
 
 /* Are the integer division expressions at position "pos1" in "bmap1" and
