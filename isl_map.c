@@ -7582,7 +7582,7 @@ isl_bool isl_map_divs_known(__isl_keep isl_map *map)
 	for (i = 0; i < map->n; ++i) {
 		int known = isl_basic_map_divs_known(map->p[i]);
 		if (known <= 0)
-			return known;
+			return isl_bool_ok(known);
 	}
 
 	return isl_bool_true;
