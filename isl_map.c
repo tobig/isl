@@ -8612,7 +8612,7 @@ isl_bool isl_basic_map_plain_is_universe(__isl_keep isl_basic_map *bmap)
 {
 	if (!bmap)
 		return isl_bool_error;
-	return bmap->n_eq == 0 && bmap->n_ineq == 0;
+	return isl_bool_ok(bmap->n_eq == 0 && bmap->n_ineq == 0);
 }
 
 /* Is "bset" obviously equal to the universe with the same space?
