@@ -799,7 +799,7 @@ static isl_bool constraint_index_is_redundant(struct isl_constraint_index *ci,
 	h = hash_index_ineq(ci, &ineq);
 	if (!ci->index[h])
 		return isl_bool_false;
-	return isl_int_ge(ineq[0], (*ci->index[h])[0]);
+	return isl_bool_ok(isl_int_ge(ineq[0], (*ci->index[h])[0]));
 }
 
 /* If we can eliminate more than one div, then we need to make
