@@ -8,5 +8,5 @@ isl_bool FN(TYPE,has_single_reference)(__isl_keep TYPE *obj)
 {
 	if (!obj)
 		return isl_bool_error;
-	return obj->ref == 1;
+	return isl_bool_ok(obj->ref == 1);
 }
